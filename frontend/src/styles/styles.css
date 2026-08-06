@@ -2013,14 +2013,21 @@ body {
   }
 }
 
-/* Very small phones */
+/* Very small phones and mobile screens (< 600px) */
+@media (max-width: 600px) {
+  .stats-grid, .grid-4, .grid-3, .grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+}
+
 @media (max-width: 375px) {
   :root {
-    --content-padding: 0.875rem;
+    --content-padding: 0.75rem;
   }
 
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
   .header-search-wrapper {
@@ -2030,5 +2037,111 @@ body {
   .sidebar-menu-item {
     font-size: 0.825rem;
     padding: 0.65rem 0.75rem;
+  }
+}
+
+/* ==========================================================================
+   UNIVERSAL RESPONSIVE OVERFLOW & LAYOUT GUARD (320px - 1920px)
+   ========================================================================== */
+html, body {
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+.app-container, .main-content, .view-section {
+  max-width: 100% !important;
+  overflow-x: hidden;
+}
+
+/* Responsive Table scroll wrappers across all views (Due Payments, Reports, Customers, Inventory) */
+.table-container, .table-responsive, .table-wrapper, div[style*="overflow"] {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-md);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* Force internal scroll instead of page clipping */
+}
+
+/* Flexbox and Grid overflow protections for cards and analytics panels */
+.card, .stat-card, .pos-card, .chart-container, .panel {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Responsive Grid layouts for Dashboard, Reports, and Inventory cards */
+@media screen and (max-width: 1024px) {
+  .stats-grid, .grid-4, .grid-3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+  }
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .stats-grid, .grid-4, .grid-3, .grid-2 {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+  }
+  .stat-card, .card {
+    padding: 1rem !important;
+  }
+  .stat-value {
+    font-size: 1.25rem !important;
+    word-break: break-all;
+  }
+  .form-row, .flex, .d-flex, .actions-bar, .filter-bar {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+  .form-control, .btn, input, select {
+    max-width: 100% !important;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  :root {
+    --content-padding: 0.75rem;
+  }
+  /* Force single column cards on all mobile devices (320px - 576px) to eliminate any clipping */
+  .stats-grid, .grid-4, .grid-3, .grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+  .stat-card, .card {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 0.875rem !important;
+  }
+  .stat-title {
+    font-size: 0.75rem !important;
+  }
+  .stat-value {
+    font-size: 1.35rem !important;
+  }
+  .btn, button {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  /* Modal responsive sizing */
+  .modal-dialog, .modal-container {
+    width: 96% !important;
+    margin: 2% auto !important;
   }
 }

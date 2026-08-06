@@ -19,7 +19,7 @@ export const App = {
   },
 
   checkAuth() {
-    const isLogged = sessionStorage.getItem('khushi_logged_in') === 'true';
+    const isLogged = sessionStorage.getItem('khushi_logged_in') === 'true' || localStorage.getItem('khushi_logged_in') === 'true';
     if (isLogged) {
       this.isLoggedIn = true;
       this.showAppLayout();
@@ -35,6 +35,11 @@ export const App = {
     const appView = document.getElementById('appContainer');
     if (loginView) loginView.style.display = 'flex';
     if (appView) appView.style.display = 'none';
+    
+    const userField = document.getElementById('loginUsername');
+    const passField = document.getElementById('loginPassword');
+    if (userField && !userField.value) userField.value = '';
+    if (passField) passField.value = '';
   },
 
   showAppLayout() {
@@ -48,6 +53,11 @@ export const App = {
     const admin = window.db ? window.db.getAdmin() : { username: 'dheypatel2690@gmail.com', passwordHash: 'dheypatel0007' };
     if (username === admin.username && password === admin.passwordHash) {
       sessionStorage.setItem('khushi_logged_in', 'true');
+      if (remember) {
+        localStorage.setItem('khushi_logged_in', 'true');
+      } else {
+        localStorage.removeItem('khushi_logged_in');
+      }
       this.isLoggedIn = true;
       this.showAppLayout();
       this.navigateTo('dashboardView');
@@ -61,8 +71,13 @@ export const App = {
 
   logout() {
     sessionStorage.removeItem('khushi_logged_in');
+    localStorage.removeItem('khushi_logged_in');
     this.isLoggedIn = false;
     this.showLoginView();
+    const userField = document.getElementById('loginUsername');
+    const passField = document.getElementById('loginPassword');
+    if (userField) userField.value = '';
+    if (passField) passField.value = '';
     Utils.showToast('Logged out securely', 'info');
   },
 

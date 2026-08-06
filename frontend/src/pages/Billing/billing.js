@@ -629,23 +629,28 @@ export const Billing = {
   },
 
   async downloadInvoicePDF(invoice) {
-    Utils.showToast('Generating PDF...', 'info');
-    const paper = document.getElementById('invoicePaper');
+    Utils.showToast('Generating high-quality A4 PDF...', 'info');
+    const paper = document.getElementById('invoicePaper') || document.getElementById('printableInvoiceContainer');
     
     if (window.html2pdf && paper) {
+      const cleanInvNumber = (invoice && invoice.invoiceNumber) ? invoice.invoiceNumber.replace(/[^a-zA-Z0-9]/g, '-') : 'Bill';
       const opt = {
-        margin:       0.3,
-        filename:     `Invoice_${invoice.invoiceNumber}.pdf`,
+        margin:       [10, 10, 10, 10],
+        filename:     `Invoice-KO-${cleanInvNumber}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, windowWidth: 1200 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
-      setTimeout(() => {
-        window.html2pdf().set(opt).from(paper).save().then(() => {
-          Utils.showToast(`Invoice ${invoice.invoiceNumber} PDF downloaded!`, 'success');
-        });
-      }, 250);
+      try {
+        await window.html2pdf().set(opt).from(paper).save();
+        Utils.showToast(`Invoice-KO-${cleanInvNumber}.pdf downloaded successfully!`, 'success');
+      } catch (err) {
+        console.error('PDF generation error:', err);
+        Utils.showToast('PDF generation failed. Opening print dialog...', 'warning');
+        window.print();
+      }
     } else {
+      Utils.showToast('PDF generator unavailable. Opening print dialog...', 'info');
       window.print();
     }
   },
