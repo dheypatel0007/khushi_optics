@@ -630,24 +630,51 @@ export const Billing = {
 
   async downloadInvoicePDF(invoice) {
     Utils.showToast('Generating high-quality A4 PDF...', 'info');
-    const paper = document.getElementById('invoicePaper') || document.getElementById('printableInvoiceContainer');
+    const sourceEl = document.getElementById('invoicePaper') || document.getElementById('printableInvoiceContainer');
     
-    if (window.html2pdf && paper) {
+    if (window.html2pdf && sourceEl) {
       const cleanInvNumber = (invoice && invoice.invoiceNumber) ? invoice.invoiceNumber.replace(/[^a-zA-Z0-9]/g, '-') : 'Bill';
+      
+      // Create a standalone desktop-width container to prevent mobile viewport squashing or left cropping
+      const cloneContainer = document.createElement('div');
+      cloneContainer.style.position = 'absolute';
+      cloneContainer.style.left = '0px';
+      cloneContainer.style.top = '0px';
+      cloneContainer.style.width = '760px';
+      cloneContainer.style.padding = '15px';
+      cloneContainer.style.background = '#ffffff';
+      cloneContainer.style.color = '#0f172a';
+      cloneContainer.style.zIndex = '-9999';
+      cloneContainer.style.pointerEvents = 'none';
+      
+      const clone = sourceEl.cloneNode(true);
+      clone.style.width = '100%';
+      clone.style.maxWidth = '100%';
+      clone.style.boxShadow = 'none';
+      clone.style.margin = '0';
+      clone.style.padding = '10px';
+      
+      cloneContainer.appendChild(clone);
+      document.body.appendChild(cloneContainer);
+
       const opt = {
         margin:       [10, 10, 10, 10],
         filename:     `Invoice-KO-${cleanInvNumber}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, windowWidth: 1200 },
+        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollX: 0, scrollY: 0 },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
       try {
-        await window.html2pdf().set(opt).from(paper).save();
+        await window.html2pdf().set(opt).from(cloneContainer).save();
         Utils.showToast(`Invoice-KO-${cleanInvNumber}.pdf downloaded successfully!`, 'success');
       } catch (err) {
         console.error('PDF generation error:', err);
         Utils.showToast('PDF generation failed. Opening print dialog...', 'warning');
         window.print();
+      } finally {
+        if (cloneContainer.parentNode) {
+          cloneContainer.parentNode.removeChild(cloneContainer);
+        }
       }
     } else {
       Utils.showToast('PDF generator unavailable. Opening print dialog...', 'info');
@@ -658,9 +685,33 @@ export const Billing = {
   async autoSavePDFToFile(invoice) {
     if (window.electronAPI && window.electronAPI.saveInvoicePDF) {
       try {
-        const paper = document.getElementById('invoicePaper');
-        if (paper && window.html2pdf) {
-          const pdfDataUri = await window.html2pdf().from(paper).outputPdf('datauristring');
+        const sourceEl = document.getElementById('invoicePaper') || document.getElementById('printableInvoiceContainer');
+        if (sourceEl && window.html2pdf) {
+          const cloneContainer = document.createElement('div');
+          cloneContainer.style.position = 'absolute';
+          cloneContainer.style.left = '0px';
+          cloneContainer.style.top = '0px';
+          cloneContainer.style.width = '760px';
+          cloneContainer.style.padding = '15px';
+          cloneContainer.style.background = '#ffffff';
+          cloneContainer.style.zIndex = '-9999';
+          
+          const clone = sourceEl.cloneNode(true);
+          clone.style.width = '100%';
+          clone.style.maxWidth = '100%';
+          clone.style.boxShadow = 'none';
+          cloneContainer.appendChild(clone);
+          document.body.appendChild(cloneContainer);
+
+          const opt = {
+            margin: [10, 10, 10, 10],
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollX: 0, scrollY: 0 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          };
+          const pdfDataUri = await window.html2pdf().set(opt).from(cloneContainer).outputPdf('datauristring');
+          if (cloneContainer.parentNode) cloneContainer.parentNode.removeChild(cloneContainer);
+
           const res = await window.electronAPI.saveInvoicePDF({
             invoiceNumber: invoice.invoiceNumber,
             base64Data: pdfDataUri,
