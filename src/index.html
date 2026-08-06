@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KHUSHI OPTICS - Billing & Management System</title>
+  
+  <!-- Inter & Outfit Fonts, Master Stylesheets -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/invoice.css">
+  
+  <!-- Chart.js & html2pdf Bundles -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body data-theme="dark">
+
+  <!-- LOGIN SCREEN -->
+  <div class="login-container" id="loginContainer">
+    <div class="login-card">
+      <div class="login-brand-header">
+        <div class="login-logo-badge">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M2 12a5 5 0 005 5h0a5 5 0 005-5V9H2v3zM12 12a5 5 0 005 5h0a5 5 0 005-5V9h-10v3zM10 11h4"/></svg>
+        </div>
+        <h1>KHUSHI OPTICS</h1>
+        <p>Optical Shop Billing & Management System</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="loginUsername">Username</label>
+          <input type="text" id="loginUsername" class="form-control" value="dhey" required placeholder="Enter username (dhey)">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" class="form-control" value="dheypatel0007" required placeholder="Enter password (dheypatel0007)">
+        </div>
+
+        <div class="form-group flex items-center justify-between mt-3">
+          <label class="flex items-center gap-2 text-sm text-secondary" style="cursor:pointer;">
+            <input type="checkbox" id="loginRemember" checked>
+            <span>Remember Login</span>
+          </label>
+          <span class="text-xs text-primary" style="font-weight:600;">Secure Portal</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg mt-4" style="width:100%;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M13 12H3"/></svg>
+          Login to System
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div class="app-container" id="appContainer" style="display:none;">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-header">
+          <div class="sidebar-logo">KO</div>
+          <div class="sidebar-brand">
+            <h2 class="shop-brand-name">KHUSHI OPTICS</h2>
+            <span>PRO BILLING POS</span>
+          </div>
+        </div>
+
+        <nav class="sidebar-menu">
+          <a href="#" class="sidebar-menu-item active" data-view="dashboardView">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </a>
+
+          <a href="#" class="sidebar-menu-item" data-view="billingView">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            POS Billing <span class="badge badge-info text-xs" style="margin-left:auto;">F2</span>
+          </a>
+
+          <a href="#" class="sidebar-menu-item" data-view="customersView">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            Customers & Rx
+          </a>
+
+          <a href="#" class="sidebar-menu-item" data-view="framesView">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12a5 5 0 005 5h0a5 5 0 005-5V9H2v3zM12 12a5 5 0 005 5h0a5 5 0 005-5V9h-10v3zM10 11h4"/></svg>
+            Frame Inventory
+          </a>
+
+          <a href="#" class="sidebar-menu-item" data-view="lensesView">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            Lens Inventory
+          </a>
+
+          <a href="#" class="sidebar-menu-item" data-view="duesView">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Due Payments
+          </a>
+
+          <a href="#" class="sidebar-menu-item" data-view="reportsView">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Reports & Profit
+          </a>
+
+          <a href="#" class="sidebar-menu-item" data-view="settingsView">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Settings & Backup
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user-info">
+          <div class="user-avatar">D</div>
+          <div>
+            <div class="text-sm font-bold">dhey</div>
+            <div class="text-xs text-muted">Admin User</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-secondary" id="logoutBtn" title="Logout">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN VIEW WRAPPER -->
+    <div class="main-wrapper">
+      
+      <!-- TOP HEADER -->
+      <header class="app-header">
+        <div class="flex items-center">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" title="Toggle Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          
+          <div class="header-search-wrapper">
+            <svg class="header-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="globalSearchInput" class="header-search-input" placeholder="Search Customer, Phone, Bill #, Frame... (F4)">
+          </div>
+        </div>
+
+        <div class="header-right-actions">
+          <button class="btn btn-sm btn-success" onclick="Billing.showUPIQRModal();">
+            📷 Show Google Pay QR
+          </button>
+          
+          <div class="header-clock" id="headerClock">Loading time...</div>
+          
+          <button class="btn btn-sm btn-secondary" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42"/></svg>
+          </button>
+
+          <button class="btn btn-sm btn-primary" onclick="App.navigateTo('billingView');">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Invoice (F2)
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENT VIEWS -->
+      <main class="view-content-body">
+        
+        <!-- DASHBOARD VIEW -->
+        <section id="dashboardView" class="view-section active">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Executive Dashboard</h1>
+              <div class="page-subtitle">KHUSHI OPTICS • Bavla, Gujarat</div>
+            </div>
+            <div class="flex gap-2">
+              <button class="btn btn-sm btn-success" onclick="Billing.showUPIQRModal();">
+                📷 Show QR Code
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="Settings.triggerClearDataWithAutoBackup();">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                Backup & Clear Data
+              </button>
+              <button class="btn btn-sm btn-secondary" onclick="Dashboard.render();">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Refresh
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Stats Grid -->
+          <div class="stats-grid">
+            <div class="card stat-card">
+              <div class="stat-icon" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+              </div>
+              <div>
+                <div class="stat-label">Today's Sales</div>
+                <div class="stat-value" id="dashTodaySales">₹0.00</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <div>
+                <div class="stat-label">Monthly Sales</div>
+                <div class="stat-value" id="dashMonthlySales">₹0.00</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <div class="stat-label">Pending Dues</div>
+                <div class="stat-value text-warning" id="dashPendingPayments">₹0.00</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-icon" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </div>
+              <div>
+                <div class="stat-label">Total Customers</div>
+                <div class="stat-value" id="dashTotalCustomers">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart & Low Stock Grid -->
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="card">
+              <div class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Weekly Revenue Trajectory
+              </div>
+              <div style="height: 250px; position: relative;">
+                <canvas id="salesChartCanvas"></canvas>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title justify-between">
+                <span class="flex items-center gap-2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-rose)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  Stock Alerts
+                </span>
+                <span class="text-xs text-muted" id="dashStockTotalsInfo">
+                  <span id="dashFramesStock">0 Pcs</span> | <span id="dashLensesStock">0 Pairs</span>
+                </span>
+              </div>
+              <div id="dashLowStockList" style="max-height: 250px; overflow-y: auto;"></div>
+            </div>
+          </div>
+
+          <!-- Recent Invoices Table -->
+          <div class="card">
+            <div class="card-title justify-between">
+              <span class="flex items-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Recent Billing Transactions
+              </span>
+              <button class="btn btn-sm btn-secondary" onclick="App.navigateTo('billingView');">Create New Bill</button>
+            </div>
+
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Invoice #</th>
+                    <th>Customer Name</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Mode</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dashRecentBillsTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- POS BILLING VIEW -->
+        <section id="billingView" class="view-section">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Optical POS Billing Engine</h1>
+              <div class="page-subtitle">Select Customer, Frame, and Lens to Generate Invoice</div>
+            </div>
+            <button class="btn btn-success" onclick="Billing.showUPIQRModal();">
+              📷 Display Google Pay QR Code
+            </button>
+          </div>
+
+          <div class="pos-layout">
+            <div class="pos-steps-container">
+              
+              <!-- STEP 1: CUSTOMER -->
+              <div class="pos-step-card">
+                <div class="pos-step-header">
+                  <div class="pos-step-number">1</div>
+                  <div class="font-bold text-lg">Select or Add Customer</div>
+                  <button class="btn btn-sm btn-secondary" style="margin-left:auto;" onclick="Customers.openAddCustomerModal();">+ Add Customer (F3)</button>
+                </div>
+                
+                <div class="form-group">
+                  <select id="posCustomerSelect" class="form-control" onchange="Billing.handleCustomerSelection(this.value);">
+                    <option value="">-- Select Customer --</option>
+                  </select>
+                </div>
+
+                <div id="posCustomerDetailsCard" style="display:none;" class="mt-2 p-3 bg-dark-card rounded border border-slate-700"></div>
+              </div>
+
+              <!-- STEP 2: FRAME -->
+              <div class="pos-step-card">
+                <div class="pos-step-header">
+                  <div class="pos-step-number">2</div>
+                  <div class="font-bold text-lg">Select Frame Item</div>
+                  <span class="font-bold text-primary text-lg" style="margin-left:auto;" id="posFramePriceDisplay">₹0.00</span>
+                </div>
+                
+                <div class="form-group">
+                  <select id="posFrameSelect" class="form-control" onchange="Billing.handleFrameSelection(this.value);">
+                    <option value="">-- Select Frame --</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- STEP 3: LENS -->
+              <div class="pos-step-card">
+                <div class="pos-step-header">
+                  <div class="pos-step-number">3</div>
+                  <div class="font-bold text-lg">Select Lens Specification</div>
+                  <span class="font-bold text-primary text-lg" style="margin-left:auto;" id="posLensPriceDisplay">₹0.00</span>
+                </div>
+                
+                <div class="form-group">
+                  <select id="posLensSelect" class="form-control" onchange="Billing.handleLensSelection(this.value);">
+                    <option value="">-- Select Lens --</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- STEP 4: DISCOUNT & EXTRA CHARGES -->
+              <div class="pos-step-card">
+                <div class="pos-step-header">
+                  <div class="pos-step-number">4</div>
+                  <div class="font-bold text-lg">Discounts & Fitting Charges</div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Discount Preset</label>
+                    <select id="posDiscountSelect" class="form-control" onchange="Billing.recalculateTotals();">
+                      <option value="0">No Discount (0%)</option>
+                      <option value="10">10% Off</option>
+                      <option value="15">15% Off</option>
+                      <option value="20">20% Off</option>
+                      <option value="25">25% Off</option>
+                      <option value="custom">Custom Discount %</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group" id="posCustomDiscountGroup" style="display:none;">
+                    <label class="form-label">Custom %</label>
+                    <input type="number" id="posCustomDiscountInput" class="form-control" placeholder="Enter %" oninput="Billing.recalculateTotals();">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Extra Accessories / Fitting (₹)</label>
+                    <input type="number" id="posExtraChargesInput" class="form-control" placeholder="0" oninput="Billing.recalculateTotals();">
+                  </div>
+                </div>
+              </div>
+
+              <!-- STEP 5: GST & PAYMENT MODE -->
+              <div class="pos-step-card">
+                <div class="pos-step-header">
+                  <div class="pos-step-number">5</div>
+                  <div class="font-bold text-lg">GST & Payment Details</div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="flex items-center gap-2 form-label" style="cursor:pointer;">
+                      <input type="checkbox" id="posGstToggle" checked onchange="Billing.recalculateTotals();">
+                      <span>Enable GST Breakdown</span>
+                    </label>
+                    <select id="posGstPercentSelect" class="form-control mt-1" onchange="Billing.recalculateTotals();">
+                      <option value="12">GST 12% (SGST 6% + CGST 6%)</option>
+                      <option value="18">GST 18% (SGST 9% + CGST 9%)</option>
+                      <option value="5">GST 5% (SGST 2.5% + CGST 2.5%)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Payment Method</label>
+                    <select id="posPaymentMethodSelect" class="form-control" onchange="Billing.handlePaymentMethodChange(this.value);">
+                      <option value="Cash">Cash</option>
+                      <option value="UPI">UPI (Google Pay / PhonePe / Paytm)</option>
+                      <option value="Card">Card (Debit/Credit)</option>
+                      <option value="Bank">Bank Transfer</option>
+                      <option value="Credit">Credit (Due)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- UPI QR Code Preview Card -->
+                <div id="posUpiQrPreviewCard" style="display:none;" class="mt-2 p-3 bg-dark-card rounded border border-emerald-500 text-center">
+                  <div class="text-xs font-bold text-success mb-2">📷 GOOGLE PAY PAYMENT QR CODE READY</div>
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=9824735065@upi%26pn=KHUSHI%20OPTICS" 
+                       style="width:160px; height:160px; display:block; margin:0 auto; border-radius:8px; border:2px solid #34d399;" alt="GPay QR Code">
+                  <button class="btn btn-sm btn-success mt-2" onclick="Billing.showUPIQRModal();">Show Large QR to Customer</button>
+                </div>
+
+                <div class="form-row mt-2">
+                  <div class="form-group">
+                    <label class="form-label">Amount Received (₹)</label>
+                    <input type="number" id="posPaidAmountInput" class="form-control" placeholder="Paid amount" oninput="Billing.recalculateTotals();">
+                  </div>
+
+                  <div class="form-group" id="posDueDateGroup" style="display:none;">
+                    <label class="form-label">Expected Due Date</label>
+                    <input type="date" id="posDueDateInput" class="form-control">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Remarks / Doctor Instructions</label>
+                  <input type="text" id="posRemarksInput" class="form-control" placeholder="e.g. Frame collection on Tuesday">
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT SUMMARY CARD -->
+            <div class="pos-summary-card">
+              <div>
+                <h3 class="card-title border-b pb-2 mb-3">Bill Summary</h3>
+
+                <div class="pos-summary-row">
+                  <span>Subtotal:</span>
+                  <strong id="posSubtotalDisplay">₹0.00</strong>
+                </div>
+
+                <div class="pos-summary-row text-success">
+                  <span>Discount:</span>
+                  <strong id="posDiscountAmountDisplay">- ₹0.00</strong>
+                </div>
+
+                <div class="pos-summary-row" id="posGstRow">
+                  <span>GST:</span>
+                  <strong id="posGstAmountDisplay">+ ₹0.00</strong>
+                </div>
+
+                <div class="pos-summary-net">
+                  <span>Net Payable:</span>
+                  <span id="posNetTotalDisplay">₹0.00</span>
+                </div>
+
+                <div class="pos-summary-row mt-2">
+                  <span>Payment Status:</span>
+                  <span id="posPaymentStatusBadge" class="badge badge-success">Full Payment</span>
+                </div>
+
+                <div class="pos-summary-row">
+                  <span>Remaining Due:</span>
+                  <strong class="text-danger" id="posBalanceDueDisplay">₹0.00</strong>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <button class="btn btn-primary btn-lg" style="width:100%; font-size:1.1rem;" onclick="Billing.generateAndSaveInvoice();">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                  Generate Invoice & Save PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CUSTOMERS VIEW -->
+        <section id="customersView" class="view-section">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Customer & Eye Power Directory</h1>
+              <div class="page-subtitle">Manage Customer Info, Contact Numbers & Prescriptions</div>
+            </div>
+            <button class="btn btn-primary" onclick="Customers.openAddCustomerModal();">+ Add New Customer</button>
+          </div>
+
+          <div class="card mb-3">
+            <div class="form-group m-0">
+              <input type="text" class="form-control" placeholder="Search by customer name, mobile, address..." oninput="Customers.renderCustomerTable(this.value);">
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Customer ID</th>
+                    <th>Name / Details</th>
+                    <th>Mobile</th>
+                    <th>Address</th>
+                    <th>Rx Prescription (RE/LE)</th>
+                    <th>Doctor</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="customersTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- FRAMES VIEW -->
+        <section id="framesView" class="view-section">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Frame Stock Inventory</h1>
+              <div class="page-subtitle">Track Frame Brands, Models, Pricing & Quantities</div>
+            </div>
+            <button class="btn btn-primary" onclick="Frames.openAddFrameModal();">+ Add New Frame</button>
+          </div>
+
+          <div class="card mb-3">
+            <div class="form-group m-0">
+              <input type="text" class="form-control" placeholder="Search frame brand, model, color, barcode..." oninput="Frames.renderFrameTable(this.value);">
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Frame ID</th>
+                    <th>Brand & Model</th>
+                    <th>Color</th>
+                    <th>Purchase Price</th>
+                    <th>Selling Price</th>
+                    <th>Stock Status</th>
+                    <th>Barcode</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="framesTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- LENSES VIEW -->
+        <section id="lensesView" class="view-section">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Lens Stock Catalog</h1>
+              <div class="page-subtitle">Essilor, Zeiss, Crizal, Hoya & Custom Lenses</div>
+            </div>
+            <button class="btn btn-primary" onclick="Lenses.openAddLensModal();">+ Add New Lens</button>
+          </div>
+
+          <div class="card mb-3">
+            <div class="form-group m-0">
+              <input type="text" class="form-control" placeholder="Search by company, type, coating..." oninput="Lenses.renderLensTable(this.value);">
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Lens ID</th>
+                    <th>Company / Index</th>
+                    <th>Lens Type</th>
+                    <th>Features / Coatings</th>
+                    <th>Purchase Price</th>
+                    <th>Selling Price</th>
+                    <th>Stock Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="lensesTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- DUES VIEW -->
+        <section id="duesView" class="view-section">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Outstanding Due Payments</h1>
+              <div class="page-subtitle">Track Customer Credit Ledger & Send WhatsApp Reminders</div>
+            </div>
+          </div>
+
+          <div class="stats-grid mb-3">
+            <div class="card stat-card">
+              <div class="stat-icon" style="background: rgba(244, 63, 94, 0.15); color: #f43f5e;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <div class="stat-label">Total Outstanding Dues</div>
+                <div class="stat-value text-danger" id="duesTotalOutstandingDisplay">₹0.00</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </div>
+              <div>
+                <div class="stat-label">Pending Customers</div>
+                <div class="stat-value" id="duesPendingCountDisplay">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Invoice #</th>
+                    <th>Customer Name</th>
+                    <th>Phone</th>
+                    <th>Total Bill</th>
+                    <th>Paid</th>
+                    <th>Due Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="duesTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- REPORTS VIEW -->
+        <section id="reportsView" class="view-section">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Reports & Financial Analytics</h1>
+              <div class="page-subtitle">Sales, Revenue, Taxes & Profit Estimation</div>
+            </div>
+            <button class="btn btn-success" onclick="Reports.exportSalesReportCSV();">Export CSV / Excel</button>
+          </div>
+
+          <div class="card mb-3 p-2 flex gap-2">
+            <button class="btn btn-sm btn-secondary report-tab-btn" data-period="daily" onclick="Reports.setPeriod('daily');">Daily</button>
+            <button class="btn btn-sm btn-secondary report-tab-btn" data-period="weekly" onclick="Reports.setPeriod('weekly');">Weekly</button>
+            <button class="btn btn-sm btn-secondary report-tab-btn active" data-period="monthly" onclick="Reports.setPeriod('monthly');">Monthly</button>
+            <button class="btn btn-sm btn-secondary report-tab-btn" data-period="yearly" onclick="Reports.setPeriod('yearly');">Yearly</button>
+          </div>
+
+          <div class="stats-grid mb-3">
+            <div class="card stat-card">
+              <div>
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value text-primary" id="reportTotalRevenue">₹0.00</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div>
+                <div class="stat-label">Paid Collections</div>
+                <div class="stat-value text-success" id="reportPaidCollection">₹0.00</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div>
+                <div class="stat-label">Total Outstanding</div>
+                <div class="stat-value text-danger" id="reportOutstanding">₹0.00</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div>
+                <div class="stat-label">Estimated Net Profit</div>
+                <div class="stat-value text-success" id="reportEstimatedProfit">₹0.00</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="card">
+              <div class="card-title">Top Selling Frames</div>
+              <div class="table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Frame Name</th>
+                      <th>Quantity Sold</th>
+                      <th>Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reportTopFramesTbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Top Selling Lenses</div>
+              <div class="table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Lens Specification</th>
+                      <th>Quantity Sold</th>
+                      <th>Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reportTopLensesTbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SETTINGS VIEW -->
+        <section id="settingsView" class="view-section">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Shop Profile & UPI Payment Settings</h1>
+              <div class="page-subtitle">Configure KHUSHI OPTICS Shop Profile, UPI ID & Backups</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="card">
+              <h3 class="card-title">Shop Details & Payment UPI</h3>
+              
+              <div class="form-group">
+                <label class="form-label">Shop Name</label>
+                <input type="text" id="setShopName" class="form-control" value="KHUSHI OPTICS">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Primary Phone (PhonePe/GPay)</label>
+                  <input type="text" id="setPhone1" class="form-control" value="9824735065">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Alternate Phone</label>
+                  <input type="text" id="setPhone2" class="form-control" value="9265778527">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Payment UPI ID (Renders QR Code on Invoice)</label>
+                <input type="text" id="setUpiId" class="form-control" value="9824735065@upi" placeholder="e.g. 9824735065@upi / 9824735065@okbizaxis">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Shop Address</label>
+                <textarea id="setAddress" class="form-control" rows="2">Krishna Complex, In Front of Yash Bhajipau, Bavla - 382220, Gujarat, India</textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Invoice Footer Message</label>
+                <input type="text" id="setInvoiceFooter" class="form-control">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Terms & Conditions</label>
+                <textarea id="setInvoiceTerms" class="form-control" rows="3"></textarea>
+              </div>
+
+              <button class="btn btn-primary" onclick="Settings.saveSettingsFromForm();">Save Shop Profile & UPI ID</button>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title">Preferences & Backup Controls</h3>
+
+              <div class="form-group">
+                <label class="form-label">Application Theme</label>
+                <select id="setThemeSelect" class="form-control" onchange="Settings.saveSettingsFromForm();">
+                  <option value="dark">Dark Glassmorphism Theme</option>
+                  <option value="light">Light POS Mode</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="flex items-center gap-2 form-label" style="cursor:pointer;">
+                  <input type="checkbox" id="setGstDefaultToggle">
+                  <span>Enable GST by Default on New Invoices</span>
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Default GST %</label>
+                <input type="number" id="setGstDefaultPercent" class="form-control" value="12">
+              </div>
+
+              <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
+
+              <h4 class="card-title text-sm">Database Backup & Reset Controls</h4>
+              <p class="text-xs text-muted mb-3">Clear all data safely. Automatically exports a full JSON backup to your PC before wiping database.</p>
+
+              <div class="flex gap-2 mb-3">
+                <button class="btn btn-success" onclick="Settings.triggerQuickBackup();">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 01-2-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                  1-Click Backup Database
+                </button>
+                <button class="btn btn-danger" onclick="Settings.triggerClearDataWithAutoBackup();">
+                  Backup & Reset All Data
+                </button>
+              </div>
+
+              <button class="btn btn-secondary btn-sm" onclick="Settings.openBillsFolder();">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 01-2-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                Open Bills Folder in Documents
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- GOOGLE PAY QR CODE POPUP MODAL -->
+  <div class="modal-overlay" id="upiQrModal">
+    <div class="modal-container" style="max-width:420px; text-align:center;">
+      <div class="modal-header" style="background:#0284c7; color:white;">
+        <h3 class="modal-title" style="color:white;">Scan & Pay via Google Pay</h3>
+        <button class="modal-close-btn" style="color:white;" onclick="Utils.closeModal('upiQrModal');">&times;</button>
+      </div>
+      <div class="modal-body" style="background:#ffffff; color:#0f172a; padding:1.5rem;">
+        <div style="font-size:14px; font-weight:bold; color:#0284c7; margin-bottom:8px;">KHUSHI OPTICS</div>
+        <div style="font-size:12px; color:#475569; margin-bottom:12px;">Scan to pay with any UPI App</div>
+        
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=upi://pay?pa=9824735065@upi%26pn=KHUSHI%20OPTICS" 
+             style="width:260px; height:260px; display:block; margin:0 auto; border-radius:12px; border:3px solid #0284c7; box-shadow:0 10px 25px rgba(0,0,0,0.15);" 
+             alt="Google Pay QR Code">
+
+        <div style="font-size:16px; font-weight:800; color:#0f172a; margin-top:15px;" id="upiQrModalAmount">
+          ₹0.00
+        </div>
+        <div style="font-size:11px; color:#0284c7; font-weight:bold; margin-top:4px;">
+          UPI ID: 9824735065@upi
+        </div>
+      </div>
+      <div class="modal-footer" style="background:#f8fafc; justify-content:center;">
+        <button class="btn btn-primary" onclick="Utils.closeModal('upiQrModal');">Done / Paid</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OTHER MODALS -->
+  <div class="modal-overlay" id="customerModal">
+    <div class="modal-container" style="max-width:750px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="customerModalTitle">Add New Customer</h3>
+        <button class="modal-close-btn" onclick="Utils.closeModal('customerModal');">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="customerModalForm">
+          <input type="hidden" id="custModalId">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Full Name *</label>
+              <input type="text" id="custName" class="form-control" required placeholder="Customer name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mobile Number *</label>
+              <input type="text" id="custMobile" class="form-control" required placeholder="10-digit phone">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Address</label>
+              <input type="text" id="custAddress" class="form-control" placeholder="Bavla, Gujarat">
+            </div>
+            <div class="form-group" style="max-width:120px;">
+              <label class="form-label">Age</label>
+              <input type="number" id="custAge" class="form-control" placeholder="Age">
+            </div>
+            <div class="form-group" style="max-width:140px;">
+              <label class="form-label">Gender</label>
+              <select id="custGender" class="form-control">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Doctor Name</label>
+              <input type="text" id="custDoctor" class="form-control" placeholder="Dr. V. K. Shah">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Remarks</label>
+              <input type="text" id="custRemarks" class="form-control" placeholder="Frame preferences, notes">
+            </div>
+          </div>
+
+          <div class="card mt-2 p-3 bg-dark-card border border-slate-700">
+            <h4 class="card-title text-sm mb-2">Eye Power Prescription (Rx Record)</h4>
+            <div class="rx-matrix-display">
+              <table class="rx-table">
+                <thead>
+                  <tr>
+                    <th>Eye</th>
+                    <th>SPH</th>
+                    <th>CYL</th>
+                    <th>AXIS</th>
+                    <th>ADD</th>
+                    <th>P.D.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Right Eye (RE)</strong></td>
+                    <td><input type="text" id="reSph" class="form-control p-1 text-center" value="0.00"></td>
+                    <td><input type="text" id="reCyl" class="form-control p-1 text-center" value="0.00"></td>
+                    <td><input type="text" id="reAxis" class="form-control p-1 text-center" value="0"></td>
+                    <td><input type="text" id="reAdd" class="form-control p-1 text-center" value="0.00"></td>
+                    <td><input type="text" id="rePd" class="form-control p-1 text-center" value="31.5"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Left Eye (LE)</strong></td>
+                    <td><input type="text" id="leSph" class="form-control p-1 text-center" value="0.00"></td>
+                    <td><input type="text" id="leCyl" class="form-control p-1 text-center" value="0.00"></td>
+                    <td><input type="text" id="leAxis" class="form-control p-1 text-center" value="0"></td>
+                    <td><input type="text" id="leAdd" class="form-control p-1 text-center" value="0.00"></td>
+                    <td><input type="text" id="lePd" class="form-control p-1 text-center" value="31.5"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="Utils.closeModal('customerModal');">Cancel</button>
+        <button class="btn btn-primary" onclick="Customers.saveCustomerFromForm();">Save Customer & Rx</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="customerHistoryModal">
+    <div class="modal-container" style="max-width:800px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Customer Prescription & Billing History</h3>
+        <button class="modal-close-btn" onclick="Utils.closeModal('customerHistoryModal');">&times;</button>
+      </div>
+      <div class="modal-body" id="customerHistoryModalBody"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="frameModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="frameModalTitle">Add New Frame</h3>
+        <button class="modal-close-btn" onclick="Utils.closeModal('frameModal');">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="frameModalForm">
+          <input type="hidden" id="frameModalId">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Brand *</label>
+              <input type="text" id="frameBrand" class="form-control" required placeholder="Ray-Ban, Titan, Oakley">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Model *</label>
+              <input type="text" id="frameModel" class="form-control" required placeholder="RB3025, Aviator">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Frame Type</label>
+              <select id="frameType" class="form-control">
+                <option value="Full Rim">Full Rim</option>
+                <option value="Half Rim">Half Rim</option>
+                <option value="Rimless">Rimless</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Color</label>
+              <input type="text" id="frameColor" class="form-control" placeholder="Matte Gold, Black">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Size</label>
+              <input type="text" id="frameSize" class="form-control" placeholder="Medium (58mm)">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Purchase Price (₹)</label>
+              <input type="number" id="framePurchasePrice" class="form-control" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Selling Price (₹) *</label>
+              <input type="number" id="frameSellingPrice" class="form-control" required value="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Quantity</label>
+              <input type="number" id="frameQuantity" class="form-control" value="1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Low Stock Alert Threshold</label>
+              <input type="number" id="frameMinAlert" class="form-control" value="3">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Barcode (Optional)</label>
+              <input type="text" id="frameBarcode" class="form-control" placeholder="Scan barcode">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="Utils.closeModal('frameModal');">Cancel</button>
+        <button class="btn btn-primary" onclick="Frames.saveFrameFromForm();">Save Frame Item</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="lensModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="lensModalTitle">Add New Lens</h3>
+        <button class="modal-close-btn" onclick="Utils.closeModal('lensModal');">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="lensModalForm">
+          <input type="hidden" id="lensModalId">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Lens Company *</label>
+              <input type="text" id="lensCompany" class="form-control" required placeholder="Essilor, Crizal, Zeiss, Hoya">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Lens Type</label>
+              <select id="lensType" class="form-control">
+                <option value="Single Vision">Single Vision</option>
+                <option value="Bifocal">Bifocal</option>
+                <option value="Progressive">Progressive</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Index / Specification</label>
+            <input type="text" id="lensIndex" class="form-control" placeholder="1.56 Mid Index, 1.61 High Index">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Coatings & Features</label>
+            <div class="flex gap-3">
+              <label class="flex items-center gap-1 text-sm"><input type="checkbox" id="featBlueCut"> Blue Cut</label>
+              <label class="flex items-center gap-1 text-sm"><input type="checkbox" id="featPhotochromic"> Photochromic</label>
+              <label class="flex items-center gap-1 text-sm"><input type="checkbox" id="featAntiGlare"> Anti Glare</label>
+              <label class="flex items-center gap-1 text-sm"><input type="checkbox" id="featHighIndex"> High Index</label>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Purchase Price (₹)</label>
+              <input type="number" id="lensPurchasePrice" class="form-control" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Selling Price (₹) *</label>
+              <input type="number" id="lensSellingPrice" class="form-control" required value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stock Quantity</label>
+              <input type="number" id="lensQuantity" class="form-control" value="10">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="Utils.closeModal('lensModal');">Cancel</button>
+        <button class="btn btn-primary" onclick="Lenses.saveLensFromForm();">Save Lens Item</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="collectPaymentModal">
+    <div class="modal-container" style="max-width:450px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Collect Due Payment</h3>
+        <button class="modal-close-btn" onclick="Utils.closeModal('collectPaymentModal');">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="collectInvNum">
+        <div class="mb-3 p-3 bg-dark-card rounded">
+          <div class="text-sm font-bold" id="collectCustomerName">Customer</div>
+          <div class="flex justify-between text-xs text-muted mt-1">
+            <span>Net Bill Total:</span> <strong id="collectNetTotal">₹0.00</strong>
+          </div>
+          <div class="flex justify-between text-xs text-muted mt-1">
+            <span>Already Paid:</span> <strong id="collectAlreadyPaid">₹0.00</strong>
+          </div>
+          <div class="flex justify-between text-sm font-bold text-danger mt-1">
+            <span>Outstanding Due:</span> <strong id="collectCurrentDue">₹0.00</strong>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Payment Amount to Collect (₹)</label>
+          <input type="number" id="collectAmountInput" class="form-control" placeholder="Enter amount">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Payment Method</label>
+          <select id="collectMethodSelect" class="form-control">
+            <option value="Cash">Cash</option>
+            <option value="UPI">UPI</option>
+            <option value="Card">Card</option>
+            <option value="Bank">Bank Transfer</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="Utils.closeModal('collectPaymentModal');">Cancel</button>
+        <button class="btn btn-success" onclick="Dues.submitPaymentCollection();">Confirm Collection</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="invoiceModal">
+    <div class="modal-container" style="max-width:850px; background:#e2e8f0;">
+      <div class="modal-header" style="background:#0f172a; color:white;">
+        <h3 class="modal-title" style="color:white;">Tax Invoice Preview</h3>
+        <button class="modal-close-btn" style="color:white;" onclick="Utils.closeModal('invoiceModal');">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:1.5rem; background:#cbd5e1;" id="printableInvoiceContainer"></div>
+      <div class="modal-footer" style="background:#0f172a;">
+        <button class="btn btn-secondary" id="invoiceModalWhatsappBtn">WhatsApp Invoice</button>
+        <button class="btn btn-secondary" id="invoiceModalPdfBtn">Download PDF</button>
+        <button class="btn btn-primary" id="invoiceModalPrintBtn">Print Invoice</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION SCRIPTS -->
+  <script src="js/db.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/customers.js"></script>
+  <script src="js/frames.js"></script>
+  <script src="js/lenses.js"></script>
+  <script src="js/billing.js"></script>
+  <script src="js/dues.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

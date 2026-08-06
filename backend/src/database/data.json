@@ -1,0 +1,180 @@
+{
+  "settings": {
+    "shopName": "KHUSHI OPTICS",
+    "phone1": "9824735065",
+    "phone2": "9265778527",
+    "upiId": "9824735065@upi",
+    "address": "Krishna Complex, In Front of Yash Bhajipau, Bavla - 382220, Gujarat, India",
+    "invoiceFooter": "Thank you for choosing KHUSHI OPTICS! Please test your eyes regularly.",
+    "terms": "1. Goods once sold will not be taken back.\n2. 6 Months warranty on frame manufacturing defects.\n3. Lens breakage is not covered under warranty.\n4. Please present this bill for any servicing or queries.",
+    "logoUrl": "",
+    "backupFolder": "Documents/KHUSHI OPTICS/Backups",
+    "theme": "dark",
+    "gstEnabledDefault": true,
+    "defaultGstPercent": 12,
+    "invoicePrefix": "KO-2026-",
+    "nextInvoiceNum": 108
+  },
+  "admin": {
+    "username": "dheypatel2690@gmail.com",
+    "passwordHash": "dheypatel0007",
+    "remember": true
+  },
+  "customers": [
+    {
+      "id": "CUST-1001",
+      "name": "Rajeshbhai Patel",
+      "mobile": "9825012345",
+      "address": "Station Road, Bavla",
+      "age": 45,
+      "gender": "Male",
+      "doctorName": "Dr. V. K. Shah",
+      "remarks": "Prefers Blue Cut progressive lenses",
+      "createdAt": "2026-07-15T10:30:00.000Z",
+      "prescription": {
+        "rightEye": {
+          "sph": "-1.50",
+          "cyl": "-0.50",
+          "axis": "90",
+          "add": "+2.00",
+          "pd": "31.5"
+        },
+        "leftEye": {
+          "sph": "-1.75",
+          "cyl": "-0.75",
+          "axis": "85",
+          "add": "+2.00",
+          "pd": "31.5"
+        }
+      }
+    },
+    {
+      "id": "CUST-1002",
+      "name": "Priyaben Sharma",
+      "mobile": "9724098765",
+      "address": "Near Government High School, Bavla",
+      "age": 28,
+      "gender": "Female",
+      "doctorName": "Dr. N. M. Mehta",
+      "remarks": "First time wearing anti-glare glasses",
+      "createdAt": "2026-07-20T14:15:00.000Z",
+      "prescription": {
+        "rightEye": {
+          "sph": "-0.75",
+          "cyl": "0.00",
+          "axis": "0",
+          "add": "0.00",
+          "pd": "30.0"
+        },
+        "leftEye": {
+          "sph": "-1.00",
+          "cyl": "-0.25",
+          "axis": "180",
+          "add": "0.00",
+          "pd": "30.0"
+        }
+      }
+    }
+  ],
+  "frames": [
+    {
+      "id": "FRM-101",
+      "brand": "Ray-Ban",
+      "model": "RB3025 Aviator",
+      "type": "Full Rim",
+      "color": "Matte Gold / Green G-15",
+      "size": "Medium (58mm)",
+      "purchasePrice": 2800,
+      "sellingPrice": 4200,
+      "quantity": 8,
+      "minAlertQty": 3,
+      "barcode": "805289602057",
+      "updatedAt": "2026-08-01"
+    },
+    {
+      "id": "FRM-102",
+      "brand": "Oakley",
+      "model": "OX8156 Holbrook RX",
+      "type": "Full Rim",
+      "color": "Satin Black",
+      "size": "Large (56mm)",
+      "purchasePrice": 2400,
+      "sellingPrice": 3800,
+      "quantity": 2,
+      "minAlertQty": 3,
+      "barcode": "888392451009",
+      "updatedAt": "2026-08-02"
+    },
+    {
+      "id": "FRM-103",
+      "brand": "Titan Eye+",
+      "model": "TE-4002 Titanium",
+      "type": "Rimless",
+      "color": "Silver Grey",
+      "size": "Medium (52mm)",
+      "purchasePrice": 1500,
+      "sellingPrice": 2500,
+      "quantity": 12,
+      "minAlertQty": 4,
+      "barcode": "890123456789",
+      "updatedAt": "2026-08-03"
+    }
+  ],
+  "lenses": [
+    {
+      "id": "LNS-201",
+      "company": "Essilor",
+      "name": "Crizal Prevencia Blue Cut",
+      "type": "Single Vision",
+      "index": "1.56",
+      "coating": "Anti-Blue Light & Anti-Reflective",
+      "purchasePrice": 1200,
+      "sellingPrice": 2200,
+      "quantity": 15,
+      "minAlertQty": 5,
+      "updatedAt": "2026-08-01"
+    },
+    {
+      "id": "LNS-202",
+      "company": "Zeiss",
+      "name": "SmartLife Progressive Superb",
+      "type": "Progressive",
+      "index": "1.61 High Index",
+      "coating": "LotuTec Hydrophobic AR",
+      "purchasePrice": 4500,
+      "sellingPrice": 7500,
+      "quantity": 4,
+      "minAlertQty": 2,
+      "updatedAt": "2026-08-02"
+    }
+  ],
+  "invoices": [
+    {
+      "invoiceNumber": "KO-2026-101",
+      "createdAt": "2026-08-01T11:00:00.000Z",
+      "customerId": "CUST-1001",
+      "customerName": "Rajeshbhai Patel",
+      "customerMobile": "9825012345",
+      "frameId": "FRM-101",
+      "frameName": "Ray-Ban RB3025 Aviator",
+      "framePrice": 4200,
+      "lensId": "LNS-201",
+      "lensName": "Essilor Crizal Prevencia Blue Cut",
+      "lensPrice": 2200,
+      "fittingCharge": 150,
+      "discountPercent": 10,
+      "discountAmount": 655,
+      "subtotal": 5895,
+      "gstEnabled": true,
+      "gstRate": 12,
+      "cgstAmount": 353.7,
+      "sgstAmount": 353.7,
+      "netTotal": 6602.4,
+      "paidAmount": 6602.4,
+      "dueAmount": 0,
+      "paymentMethod": "UPI",
+      "status": "Paid",
+      "deliveryDate": "2026-08-03"
+    }
+  ]
+}
