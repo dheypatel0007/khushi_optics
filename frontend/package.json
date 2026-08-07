@@ -11,9 +11,7 @@
   "dependencies": {
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
-    "xlsx": "^0.18.5"
-  },
-  "devDependencies": {
+    "xlsx": "^0.18.5",
     "vite": "^5.2.0"
   },
   "author": "KHUSHI OPTICS",
