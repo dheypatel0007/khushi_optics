@@ -12,10 +12,7 @@ class CloudDatabase {
     }
 
     try {
-      await mongoose.connect(env.mongoUri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      });
+      await mongoose.connect(env.mongoUri);
       logger.info('Connected to MongoDB Atlas permanent cloud database.');
       await this.syncWithCloud();
     } catch (dbErr) {
