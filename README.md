@@ -107,7 +107,7 @@ npm run install:all
 ```bash
 npm run dev
 ```
-- **Frontend Dev Server**: [http://localhost:3000](http://localhost:3000)
+- **Frontend App**: [https://khushi-optics.vercel.app/](https://khushi-optics.vercel.app/)
 - **Backend Express REST API**: [http://localhost:5000/api](http://localhost:5000/api)
 - **API Health Check Route**: [http://localhost:5000/api/health](http://localhost:5000/api/health)
 
