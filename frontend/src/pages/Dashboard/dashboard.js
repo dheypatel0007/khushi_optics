@@ -8,7 +8,7 @@ export const Dashboard = {
   salesChart: null,
   selectedBranch: 'all',
 
-  render() {
+  async render() {
     this.populateBranchFilter();
     this.updateStatCards();
     this.renderLowStockAlerts();
@@ -16,8 +16,8 @@ export const Dashboard = {
     this.renderSalesChart();
   },
 
-  populateBranchFilter() {
-    const branches = window.db ? window.db.getBranches() : [];
+  async populateBranchFilter() {
+    const branches = window.db ? await window.db.getBranches() : [];
     const select = document.getElementById('dashBranchSelect');
     if (!select) return;
 
@@ -36,11 +36,11 @@ export const Dashboard = {
     this.renderSalesChart();
   },
 
-  updateStatCards() {
-    const invoices = window.db ? window.db.getInvoices() : [];
-    const customers = window.db ? window.db.getCustomers() : [];
-    const frames = window.db ? window.db.getFrames() : [];
-    const lenses = window.db ? window.db.getLenses() : [];
+  async updateStatCards() {
+    const invoices = window.db ? await window.db.getInvoices() : [];
+    const customers = window.db ? await window.db.getCustomers() : [];
+    const frames = window.db ? await window.db.getFrames() : [];
+    const lenses = window.db ? await window.db.getLenses() : [];
 
     const todayStr = new Date().toISOString().slice(0, 10);
     const currentMonth = new Date().getMonth();
@@ -107,9 +107,9 @@ export const Dashboard = {
     if (elSecBranch) elSecBranch.textContent = Utils.formatCurrency(secondaryBranchesSales);
   },
 
-  renderLowStockAlerts() {
-    const frames = window.db ? window.db.getFrames() : [];
-    const lenses = window.db ? window.db.getLenses() : [];
+  async renderLowStockAlerts() {
+    const frames = window.db ? await window.db.getFrames() : [];
+    const lenses = window.db ? await window.db.getLenses() : [];
     const container = document.getElementById('dashLowStockList');
 
     if (!container) return;
@@ -154,8 +154,8 @@ export const Dashboard = {
     `).join('');
   },
 
-  renderRecentBills() {
-    const invoices = window.db ? window.db.getInvoices() : [];
+  async renderRecentBills() {
+    const invoices = window.db ? await window.db.getInvoices() : [];
     const tbody = document.getElementById('dashRecentBillsTbody');
     if (!tbody) return;
 
@@ -186,7 +186,7 @@ export const Dashboard = {
     `).join('');
   },
 
-  renderSalesChart() {
+  async renderSalesChart() {
     const canvas = document.getElementById('salesChartCanvas');
     if (!canvas || !window.Chart) return;
 
@@ -194,7 +194,7 @@ export const Dashboard = {
       this.salesChart.destroy();
     }
 
-    const invoices = window.db ? window.db.getInvoices() : [];
+    const invoices = window.db ? await window.db.getInvoices() : [];
     const filteredInvoices = invoices.filter(inv => {
       const invBranch = inv.branchName || 'Bavla Branch (Main)';
       return this.selectedBranch === 'all' || invBranch === this.selectedBranch;

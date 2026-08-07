@@ -29,4 +29,17 @@ window.Settings = Settings;
 
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
+
+  // Listen for Real-Time WebSocket and Cloud Database Sync events to re-render active UI instantly
+  window.addEventListener('cloud_sync', (e) => {
+    console.log('🔄 Real-Time Cloud Sync trigger received. Refreshing active screen...', e.detail);
+    if (App.currentView === 'dashboardView' && Dashboard.render) Dashboard.render();
+    else if (App.currentView === 'customersView' && Customers.renderTable) Customers.renderTable();
+    else if (App.currentView === 'billingView' && Billing.renderRecentInvoices) Billing.renderRecentInvoices();
+    else if (App.currentView === 'duesView' && Dues.renderTable) Dues.renderTable();
+    else if (App.currentView === 'framesView' && Frames.renderTable) Frames.renderTable();
+    else if (App.currentView === 'lensesView' && Lenses.renderTable) Lenses.renderTable();
+    else if (App.currentView === 'reportsView' && Reports.generateReport) Reports.generateReport();
+    else if (App.currentView === 'settingsView' && Settings.populateFields) Settings.populateFields();
+  });
 });

@@ -5,12 +5,11 @@
 import { Utils } from '../../utils/utils.js';
 
 export const Frames = {
-  render() {
+  async render() {
     this.renderFrameTable();
   },
-
-  renderFrameTable(filterQuery = '') {
-    const frames = window.db ? window.db.getFrames() : [];
+  async renderFrameTable(filterQuery = '') {
+    const frames = window.db ? await window.db.getFrames() : [];
     const tbody = document.getElementById('framesTbody');
     if (!tbody) return;
 
@@ -68,7 +67,7 @@ export const Frames = {
     tbody.innerHTML = html;
   },
 
-  openAddFrameModal() {
+  async openAddFrameModal() {
     const form = document.getElementById('frameModalForm');
     if (form) form.reset();
     const title = document.getElementById('frameModalTitle');
@@ -77,9 +76,8 @@ export const Frames = {
     if (id) id.value = '';
     Utils.openModal('frameModal');
   },
-
-  openEditFrameModal(id) {
-    const frame = window.db ? window.db.getFrameById(id) : null;
+  async openEditFrameModal(id) {
+    const frame = window.db ? await window.db.getFrameById(id) : null;
     if (!frame) return;
 
     const title = document.getElementById('frameModalTitle');
@@ -98,8 +96,7 @@ export const Frames = {
 
     Utils.openModal('frameModal');
   },
-
-  saveFrameFromForm() {
+  async saveFrameFromForm() {
     const brand = document.getElementById('frameBrand').value.trim();
     const model = document.getElementById('frameModel').value.trim();
     const sellingPrice = parseFloat(document.getElementById('frameSellingPrice').value) || 0;
@@ -128,13 +125,31 @@ export const Frames = {
     Utils.showToast(`Frame ${brand} ${model} saved!`, 'success');
     this.renderFrameTable();
   },
-
-  deleteFrame(id) {
+  async deleteFrame(id) {
+    const role = sessionStorage.getItem('khushi_user_role') || (window.db?.getAdmin()?.role) || 'Admin';
+    if (role === 'Staff') {
+      Utils.showToast('Access Denied: Staff accounts cannot delete inventory items.', 'error');
+      return;
+    }
     if (confirm('Delete this frame from stock?')) {
       if (window.db) window.db.deleteFrame(id);
       Utils.showToast('Frame removed from inventory', 'info');
       this.renderFrameTable();
     }
+  },
+  async exportFramesExcel() {
+    const frames = window.db ? await window.db.getFrames() : [];
+    if (!frames.length) return Utils.showToast('No frames in inventory to export', 'warning');
+    const rows = frames.map(f => ({
+      'Item ID': f.id, 'Brand': f.brand, 'Model': f.model, 'Type': f.type || '', 'Color': f.color || '', 'Size': f.size || '', 'Selling Price (₹)': f.sellingPrice || 0, 'Stock Qty': f.quantity || 0, 'Min Alert Qty': f.minAlertQty || 0, 'Barcode': f.barcode || ''
+    }));
+    Utils.exportToExcel(`KHUSHI_OPTICS_Frames_Inventory_${new Date().toISOString().slice(0, 10)}.xlsx`, rows, 'Frames Inventory');
+  },
+  async exportFramesCSV() {
+    const frames = window.db ? await window.db.getFrames() : [];
+    if (!frames.length) return Utils.showToast('No frames to export', 'warning');
+    const rows = frames.map(f => ({ ID: f.id, Brand: f.brand, Model: f.model, Price: f.sellingPrice, Qty: f.quantity, Barcode: f.barcode || '' }));
+    Utils.exportToCSV(`KHUSHI_OPTICS_Frames_Inventory_${new Date().toISOString().slice(0, 10)}.csv`, rows);
   }
 };
 

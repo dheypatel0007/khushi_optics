@@ -19,7 +19,7 @@ export const Billing = {
     dueDate: ''
   },
 
-  render() {
+  async render() {
     this.populateCustomerDropdown();
     this.populateFrameDropdown();
     this.populateLensDropdown();
@@ -37,9 +37,8 @@ export const Billing = {
       }
     }, 100);
   },
-
-  populateBranchDropdown() {
-    const branches = window.db ? window.db.getBranches() : [];
+  async populateBranchDropdown() {
+    const branches = window.db ? await window.db.getBranches() : [];
     const select = document.getElementById('posBranchSelect');
     if (!select) return;
 
@@ -50,8 +49,8 @@ export const Billing = {
     }).join('');
   },
 
-  populateCustomerDropdown() {
-    const customers = window.db ? window.db.getCustomers() : [];
+  async populateCustomerDropdown() {
+    const customers = window.db ? await window.db.getCustomers() : [];
     const select = document.getElementById('posCustomerSelect');
     if (!select) return;
 
@@ -62,8 +61,8 @@ export const Billing = {
     select.innerHTML = html;
   },
 
-  populateFrameDropdown() {
-    const frames = window.db ? window.db.getFrames() : [];
+  async populateFrameDropdown() {
+    const frames = window.db ? await window.db.getFrames() : [];
     const select = document.getElementById('posFrameSelect');
     if (!select) return;
 
@@ -75,8 +74,8 @@ export const Billing = {
     select.innerHTML = html;
   },
 
-  populateLensDropdown() {
-    const lenses = window.db ? window.db.getLenses() : [];
+  async populateLensDropdown() {
+    const lenses = window.db ? await window.db.getLenses() : [];
     const select = document.getElementById('posLensSelect');
     if (!select) return;
 
@@ -87,8 +86,7 @@ export const Billing = {
     });
     select.innerHTML = html;
   },
-
-  handleCustomerSelection(customerId) {
+  async handleCustomerSelection(customerId) {
     if (!customerId) {
       this.activeInvoice.customer = null;
       const card = document.getElementById('posCustomerDetailsCard');
@@ -96,7 +94,7 @@ export const Billing = {
       return;
     }
 
-    const customer = window.db ? window.db.getCustomerById(customerId) : null;
+    const customer = window.db ? await window.db.getCustomerById(customerId) : null;
     if (customer) {
       this.activeInvoice.customer = customer;
       const detailsCard = document.getElementById('posCustomerDetailsCard');
@@ -123,14 +121,13 @@ export const Billing = {
       }
     }
   },
-
-  handleFrameSelection(frameId) {
+  async handleFrameSelection(frameId) {
     if (!frameId) {
       this.activeInvoice.selectedFrame = null;
       const el = document.getElementById('posFramePriceDisplay');
       if (el) el.textContent = '₹0.00';
     } else {
-      const frame = window.db ? window.db.getFrameById(frameId) : null;
+      const frame = window.db ? await window.db.getFrameById(frameId) : null;
       if (frame) {
         this.activeInvoice.selectedFrame = frame;
         const el = document.getElementById('posFramePriceDisplay');
@@ -139,14 +136,13 @@ export const Billing = {
     }
     this.recalculateTotals();
   },
-
-  handleLensSelection(lensId) {
+  async handleLensSelection(lensId) {
     if (!lensId) {
       this.activeInvoice.selectedLens = null;
       const el = document.getElementById('posLensPriceDisplay');
       if (el) el.textContent = '₹0.00';
     } else {
-      const lens = window.db ? window.db.getLensById(lensId) : null;
+      const lens = window.db ? await window.db.getLensById(lensId) : null;
       if (lens) {
         this.activeInvoice.selectedLens = lens;
         const el = document.getElementById('posLensPriceDisplay');
@@ -155,8 +151,7 @@ export const Billing = {
     }
     this.recalculateTotals();
   },
-
-  handlePaymentMethodChange(method) {
+  async handlePaymentMethodChange(method) {
     const qrContainer = document.getElementById('posUpiQrPreviewCard');
     if (qrContainer) {
       qrContainer.style.display = method === 'UPI' ? 'block' : 'none';
@@ -170,8 +165,7 @@ export const Billing = {
     if (el) el.textContent = Utils.formatCurrency(netTotal);
     Utils.openModal('upiQrModal');
   },
-
-  recalculateTotals() {
+  async recalculateTotals() {
     const framePrice = this.activeInvoice.selectedFrame ? parseFloat(this.activeInvoice.selectedFrame.sellingPrice) : 0;
     const lensPrice = this.activeInvoice.selectedLens ? parseFloat(this.activeInvoice.selectedLens.sellingPrice) : 0;
     const extraPrice = parseFloat(document.getElementById('posExtraChargesInput')?.value) || 0;
@@ -257,8 +251,7 @@ export const Billing = {
     this.activeInvoice.paidAmount = paidAmount;
     this.activeInvoice.balanceDue = balanceDue;
   },
-
-  generateAndSaveInvoice() {
+  async generateAndSaveInvoice() {
     if (!this.activeInvoice.customer) {
       Utils.showToast('Please select or create a Customer first!', 'warning');
       return;
@@ -345,8 +338,7 @@ export const Billing = {
     this.autoSavePDFToFile(savedInvoice);
     this.resetBillingForm();
   },
-
-  resetBillingForm() {
+  async resetBillingForm() {
     this.activeInvoice = {
       customer: null,
       selectedFrame: null,
@@ -384,14 +376,40 @@ export const Billing = {
     this.recalculateTotals();
   },
 
-  viewInvoiceDetails(invoiceNumber) {
-    const invoice = window.db ? window.db.getInvoiceByNumber(invoiceNumber) : null;
+  async printInvoice(invoiceNumber) {
+    const invoice = window.db ? await window.db.getInvoiceByNumber(invoiceNumber) : null;
     if (!invoice) return;
 
-    const shop = window.db ? window.db.getSettings() : { shopName: 'KHUSHI OPTICS' };
+    const shop = window.db ? await window.db.getSettings() : { shopName: 'KHUSHI OPTICS' };
     const container = document.getElementById('printableInvoiceContainer');
     if (!container) return;
+    
+    container.innerHTML = await this.generateInvoiceHtml(invoice, shop, true);
 
+    const printBtn = document.getElementById('invoiceModalPrintBtn');
+    const pdfBtn = document.getElementById('invoiceModalPdfBtn');
+    const waBtn = document.getElementById('invoiceModalWhatsappBtn');
+
+    if (printBtn) printBtn.onclick = () => this.printInvoiceAction();
+    if (pdfBtn) pdfBtn.onclick = () => this.downloadInvoicePDF(invoice);
+    if (waBtn) waBtn.onclick = () => this.shareWhatsAppInvoice(invoice);
+
+    let warrantyBtn = document.getElementById('invoiceModalWarrantyBtn');
+    if (!warrantyBtn) {
+      warrantyBtn = document.createElement('button');
+      warrantyBtn.id = 'invoiceModalWarrantyBtn';
+      warrantyBtn.className = 'btn btn-secondary';
+      warrantyBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Warranty Card`;
+      const footer = document.querySelector('#invoiceModal .modal-footer');
+      if (footer && printBtn) footer.insertBefore(warrantyBtn, printBtn);
+    }
+    warrantyBtn.onclick = () => this.generateWarrantyCard(invoice);
+
+    Utils.openModal('invoiceModal');
+  },
+
+  async generateInvoiceHtml(invoice, shop, isPrint = false) {
+    const shopData = shop || (window.db ? await window.db.getSettings() : { shopName: 'KHUSHI OPTICS' });
     const rx = invoice.prescription || { rightEye: {}, leftEye: {} };
     const dateFormatted = Utils.formatDateTime(invoice.date);
 
@@ -407,15 +425,15 @@ export const Billing = {
       `;
     });
 
-    const qrCodeHtml = Utils.generateUPIQRCode(shop.upiId || 'dheypatel2690-1@okicici', shop.shopName, invoice.netTotal, invoice.invoiceNumber);
+    const qrCodeHtml = Utils.generateUPIQRCode(shopData.upiId || 'dheypatel2690-1@okicici', shopData.shopName, invoice.netTotal, invoice.invoiceNumber);
 
-    container.innerHTML = `
+    return `
       <div class="invoice-paper" id="invoicePaper">
         <div class="inv-header">
           <div class="inv-brand">
-            <h2>${shop.shopName}</h2>
-            <div class="inv-sub font-mono">${shop.address}</div>
-            <div class="inv-sub">Phone: <strong>${shop.phone1}</strong> / <strong>${shop.phone2}</strong></div>
+            <h2>${shopData.shopName}</h2>
+            <div class="inv-sub font-mono">${shopData.address}</div>
+            <div class="inv-sub">Phone: <strong>${shopData.phone1}</strong> / <strong>${shopData.phone2}</strong></div>
           </div>
           <div class="inv-meta">
             <div class="inv-title">TAX INVOICE</div>
@@ -529,7 +547,7 @@ export const Billing = {
         <div class="inv-footer-row mt-4">
           <div class="inv-terms">
             <strong>Terms & Conditions:</strong><br>
-            ${(shop.terms || '').replace(/\n/g, '<br>')}
+            ${(shopData.terms || '').replace(/\n/g, '<br>')}
           </div>
           <div class="inv-signature">
             <br><br>
@@ -541,31 +559,10 @@ export const Billing = {
         </div>
       </div>
     `;
-
-    const printBtn = document.getElementById('invoiceModalPrintBtn');
-    const pdfBtn = document.getElementById('invoiceModalPdfBtn');
-    const waBtn = document.getElementById('invoiceModalWhatsappBtn');
-
-    if (printBtn) printBtn.onclick = () => this.printInvoice();
-    if (pdfBtn) pdfBtn.onclick = () => this.downloadInvoicePDF(invoice);
-    if (waBtn) waBtn.onclick = () => this.shareWhatsAppInvoice(invoice);
-
-    let warrantyBtn = document.getElementById('invoiceModalWarrantyBtn');
-    if (!warrantyBtn) {
-      warrantyBtn = document.createElement('button');
-      warrantyBtn.id = 'invoiceModalWarrantyBtn';
-      warrantyBtn.className = 'btn btn-secondary';
-      warrantyBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Warranty Card`;
-      const footer = document.querySelector('#invoiceModal .modal-footer');
-      if (footer && printBtn) footer.insertBefore(warrantyBtn, printBtn);
-    }
-    warrantyBtn.onclick = () => this.generateWarrantyCard(invoice);
-
-    Utils.openModal('invoiceModal');
   },
 
-  generateWarrantyCard(invoice) {
-    const shop = window.db ? window.db.getSettings() : { shopName: 'KHUSHI OPTICS' };
+  async generateWarrantyCard(invoice) {
+    const shop = window.db ? await window.db.getSettings() : { shopName: 'KHUSHI OPTICS' };
     const rx = invoice.prescription || { rightEye: {}, leftEye: {} };
     const dateObj = new Date(invoice.date || Date.now());
     const validUntil = new Date(dateObj);

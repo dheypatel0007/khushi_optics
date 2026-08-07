@@ -13,7 +13,7 @@
     "gstEnabledDefault": true,
     "defaultGstPercent": 12,
     "invoicePrefix": "KO-2026-",
-    "nextInvoiceNum": 108
+    "nextInvoiceNum": 109
   },
   "admin": {
     "username": "dheypatel2690@gmail.com",
@@ -21,6 +21,33 @@
     "remember": true
   },
   "customers": [
+    {
+      "id": "CUST-6090",
+      "name": "dharma",
+      "mobile": "8866879758",
+      "address": "ghuma",
+      "age": 22,
+      "gender": "Male",
+      "doctorName": "dr dhey",
+      "remarks": "blue cut hd",
+      "prescription": {
+        "rightEye": {
+          "sph": "1.00",
+          "cyl": "0.00",
+          "axis": "0",
+          "add": "0.00",
+          "pd": "31.5"
+        },
+        "leftEye": {
+          "sph": "2.00",
+          "cyl": "0.00",
+          "axis": "0",
+          "add": "0.00",
+          "pd": "31.5"
+        }
+      },
+      "createdAt": "2026-08-06T15:07:20.305Z"
+    },
     {
       "id": "CUST-1001",
       "name": "Rajeshbhai Patel",
@@ -86,10 +113,10 @@
       "size": "Medium (58mm)",
       "purchasePrice": 2800,
       "sellingPrice": 4200,
-      "quantity": 8,
+      "quantity": 7,
       "minAlertQty": 3,
       "barcode": "805289602057",
-      "updatedAt": "2026-08-01"
+      "updatedAt": "2026-08-06"
     },
     {
       "id": "FRM-102",
@@ -130,9 +157,9 @@
       "coating": "Anti-Blue Light & Anti-Reflective",
       "purchasePrice": 1200,
       "sellingPrice": 2200,
-      "quantity": 15,
+      "quantity": 14,
       "minAlertQty": 5,
-      "updatedAt": "2026-08-01"
+      "updatedAt": "2026-08-06"
     },
     {
       "id": "LNS-202",
@@ -149,6 +176,73 @@
     }
   ],
   "invoices": [
+    {
+      "date": "2026-08-06T15:07:58.148Z",
+      "branchName": "Bavla Branch (Main)",
+      "customerId": "CUST-6090",
+      "customerName": "dharma",
+      "customerPhone": "8866879758",
+      "customerAddress": "ghuma",
+      "prescription": {
+        "rightEye": {
+          "sph": "1.00",
+          "cyl": "0.00",
+          "axis": "0",
+          "add": "0.00",
+          "pd": "31.5"
+        },
+        "leftEye": {
+          "sph": "2.00",
+          "cyl": "0.00",
+          "axis": "0",
+          "add": "0.00",
+          "pd": "31.5"
+        }
+      },
+      "doctorName": "dr dhey",
+      "items": [
+        {
+          "type": "Frame",
+          "id": "FRM-101",
+          "title": "Ray-Ban RB3025 Aviator (Full Rim)",
+          "qty": 1,
+          "unitPrice": 4200,
+          "amount": 4200
+        },
+        {
+          "type": "Lens",
+          "id": "LNS-201",
+          "title": "Essilor Single Vision (1.56)",
+          "qty": 1,
+          "unitPrice": 2200,
+          "amount": 2200
+        },
+        {
+          "type": "Service",
+          "id": "SRV-01",
+          "title": "Fitting / Cleaning & Accessories",
+          "qty": 1,
+          "unitPrice": 12000,
+          "amount": 12000
+        }
+      ],
+      "subtotal": 18400,
+      "discountPercent": 10,
+      "discountAmount": 1840,
+      "gstEnabled": true,
+      "gstPercent": 12,
+      "cgstAmount": 993.6,
+      "sgstAmount": 993.6,
+      "totalGstAmount": 1987.2,
+      "netTotal": 18547,
+      "paidAmount": 18547,
+      "balanceDue": 0,
+      "paymentMethod": "UPI",
+      "paymentStatus": "Paid",
+      "remarks": "",
+      "invoiceNumber": "KO-2026-108",
+      "createdAt": "2026-08-06T15:07:58.786Z"
+    },
     {
       "invoiceNumber": "KO-2026-101",
       "createdAt": "2026-08-01T11:00:00.000Z",

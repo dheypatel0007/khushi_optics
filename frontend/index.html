@@ -10,9 +10,11 @@
   <link rel="stylesheet" href="/src/styles/styles.css">
   <link rel="stylesheet" href="/src/styles/invoice.css">
 
-  <!-- Chart.js & html2pdf Bundles -->
+  <!-- Chart.js, html2pdf, SheetJS (Excel) & Socket.IO Bundles -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
 
 <body data-theme="dark">
@@ -658,7 +660,13 @@
           <h1 class="page-title">Customer & Rx Management</h1>
           <p class="page-subtitle">Registry of Patients, Contact Info & Optical Eye Power Matrix</p>
         </div>
-        <div class="page-header-actions">
+        <div class="page-header-actions flex gap-2 flex-wrap">
+          <button class="btn btn-success btn-sm" style="background:#16a34a; color:#fff;" onclick="Customers.exportCustomersExcel();">
+            Download Excel (.xlsx)
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="Customers.exportCustomersCSV();">
+            Export CSV
+          </button>
           <button class="btn btn-danger btn-sm" onclick="Customers.deleteAllCustomers();">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="3 6 5 6 21 6" />
@@ -705,7 +713,11 @@
           <h1 class="page-title">Frame Stock Inventory</h1>
           <p class="page-subtitle">Brands, Models, Pricing, Quantity & Barcode Registry</p>
         </div>
-        <button class="btn btn-primary" onclick="Frames.openAddFrameModal();">+ Add Frame Stock</button>
+        <div class="page-header-actions flex gap-2 flex-wrap">
+          <button class="btn btn-success btn-sm" style="background:#16a34a; color:#fff;" onclick="Frames.exportFramesExcel();">Download Excel (.xlsx)</button>
+          <button class="btn btn-secondary btn-sm" onclick="Frames.exportFramesCSV();">Export CSV</button>
+          <button class="btn btn-primary" onclick="Frames.openAddFrameModal();">+ Add Frame Stock</button>
+        </div>
       </div>
 
       <div class="card mb-3 p-3">
@@ -742,7 +754,11 @@
           <h1 class="page-title">Lens Catalog & Features</h1>
           <p class="page-subtitle">Essilor, Zeiss, Crizal, Blue Cut & Anti-Glare Lens Registry</p>
         </div>
-        <button class="btn btn-primary" onclick="Lenses.openAddLensModal();">+ Add Lens Item</button>
+        <div class="page-header-actions flex gap-2 flex-wrap">
+          <button class="btn btn-success btn-sm" style="background:#16a34a; color:#fff;" onclick="Lenses.exportLensesExcel();">Download Excel (.xlsx)</button>
+          <button class="btn btn-secondary btn-sm" onclick="Lenses.exportLensesCSV();">Export CSV</button>
+          <button class="btn btn-primary" onclick="Lenses.openAddLensModal();">+ Add Lens Item</button>
+        </div>
       </div>
 
       <div class="card mb-3 p-3">
@@ -778,6 +794,10 @@
         <div>
           <h1 class="page-title">Due Payment & Credit Tracker</h1>
           <p class="page-subtitle">Outstanding Credit Balances & WhatsApp Collection Reminders</p>
+        </div>
+        <div class="page-header-actions flex gap-2 flex-wrap">
+          <button class="btn btn-success btn-sm" style="background:#16a34a; color:#fff;" onclick="Dues.exportDuesExcel();">Download Excel (.xlsx)</button>
+          <button class="btn btn-secondary btn-sm" onclick="Dues.exportDuesCSV();">Export CSV</button>
         </div>
       </div>
 
@@ -842,14 +862,34 @@
           <h1 class="page-title">Reports & Business Intelligence</h1>
           <p class="page-subtitle">Revenue Analysis, Net Profit Metrics & Top Selling Products</p>
         </div>
-        <div class="page-header-actions">
+        <div class="page-header-actions flex gap-2 flex-wrap">
           <button class="btn btn-primary" onclick="Reports.printSalesReport();">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="6 9 6 2 18 2 18 9" />
               <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
               <rect x="6" y="14" width="12" height="8" />
             </svg>
-            Print Sales Report
+            Print Report
+          </button>
+          <button class="btn btn-danger" style="background:#ef4444; color:#fff;" onclick="Reports.exportSalesReportPDF();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="12" y1="18" x2="12" y2="12" />
+              <line x1="9" y1="15" x2="15" y2="15" />
+            </svg>
+            Download PDF
+          </button>
+          <button class="btn btn-success" style="background:#16a34a; color:#fff;" onclick="Reports.exportSalesReportExcel();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <path d="M8 13h2" />
+              <path d="M8 17h2" />
+              <path d="M14 13h2" />
+              <path d="M14 17h2" />
+            </svg>
+            Download Excel (.xlsx)
           </button>
           <button class="btn btn-secondary" onclick="Reports.exportSalesReportCSV();">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -862,17 +902,27 @@
         </div>
       </div>
 
-      <div class="card p-3 mb-4 flex gap-2 flex-wrap">
-        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="daily"
-          onclick="Reports.setPeriod('daily');">Today's Sales</button>
-        <button class="btn btn-sm btn-secondary report-tab-btn active" data-period="monthly"
-          onclick="Reports.setPeriod('monthly');">This Month</button>
-        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="3months"
-          onclick="Reports.setPeriod('3months');">Last 3 Months</button>
-        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="6months"
-          onclick="Reports.setPeriod('6months');">Last 6 Months</button>
-        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="yearly"
-          onclick="Reports.setPeriod('yearly');">This Year</button>
+      <div class="card p-3 mb-4 flex gap-2 flex-wrap items-center">
+        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="daily" onclick="Reports.setPeriod('daily');">Today</button>
+        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="yesterday" onclick="Reports.setPeriod('yesterday');">Yesterday</button>
+        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="weekly" onclick="Reports.setPeriod('weekly');">Last 7 Days</button>
+        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="30days" onclick="Reports.setPeriod('30days');">Last 30 Days</button>
+        <button class="btn btn-sm btn-secondary report-tab-btn active" data-period="monthly" onclick="Reports.setPeriod('monthly');">This Month</button>
+        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="lastmonth" onclick="Reports.setPeriod('lastmonth');">Last Month</button>
+        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="3months" onclick="Reports.setPeriod('3months');">Last 3 Months</button>
+        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="6months" onclick="Reports.setPeriod('6months');">Last 6 Months</button>
+        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="yearly" onclick="Reports.setPeriod('yearly');">This Year</button>
+        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="lastyear" onclick="Reports.setPeriod('lastyear');">Last Year</button>
+        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="3years" onclick="Reports.setPeriod('3years');">Last 3 Years</button>
+        <button class="btn btn-sm btn-secondary report-tab-btn" data-period="lifetime" onclick="Reports.setPeriod('lifetime');">All Time (Lifetime)</button>
+      </div>
+
+      <div class="card p-3 mb-4 flex gap-3 flex-wrap items-center" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);">
+        <span style="font-size:0.85rem; font-weight:700; color:#cbd5e1;">Custom Date Range Filter:</span>
+        <input type="date" id="reportFromDate" class="form-control" style="max-width:180px; height:34px; font-size:0.85rem;">
+        <span style="font-size:0.85rem; color:#64748b;">to</span>
+        <input type="date" id="reportToDate" class="form-control" style="max-width:180px; height:34px; font-size:0.85rem;">
+        <button class="btn btn-sm btn-primary" onclick="Reports.setCustomRange();">Apply Custom Filter</button>
       </div>
 
       <div class="stats-grid">

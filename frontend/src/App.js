@@ -8,7 +8,7 @@ export const App = {
   currentView: 'dashboardView',
   isLoggedIn: false,
 
-  init() {
+  async init() {
     this.checkAuth();
     this.setupEventListeners();
     this.setupKeyboardShortcuts();
@@ -49,8 +49,8 @@ export const App = {
     if (appView) appView.style.display = 'flex';
   },
 
-  login(username, password, remember) {
-    const admin = window.db ? window.db.getAdmin() : { username: 'dheypatel2690@gmail.com', passwordHash: 'dheypatel0007' };
+  async login(username, password, remember) {
+    const admin = window.db ? await window.db.getAdmin() : { username: 'dheypatel2690@gmail.com', passwordHash: 'dheypatel0007' };
     if (username === admin.username && password === admin.passwordHash) {
       sessionStorage.setItem('khushi_logged_in', 'true');
       if (remember) {
@@ -190,12 +190,12 @@ export const App = {
 
     const changePasswordForm = document.getElementById('changePasswordForm');
     if (changePasswordForm) {
-      changePasswordForm.addEventListener('submit', (e) => {
+      changePasswordForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const currentP = document.getElementById('currentPassword').value;
         const newP = document.getElementById('newPassword').value;
         const confirmP = document.getElementById('confirmPassword').value;
-        const admin = window.db ? window.db.getAdmin() : { passwordHash: 'dheypatel0007' };
+        const admin = window.db ? await window.db.getAdmin() : { passwordHash: 'dheypatel0007' };
 
         if (currentP !== admin.passwordHash) {
           Utils.showToast('Current password is incorrect', 'error');
@@ -211,12 +211,25 @@ export const App = {
         }
 
         admin.passwordHash = newP;
-        if (window.db) window.db.saveAdmin(admin);
+        if (window.db) window.db.updateAdminCredentials(admin.username, newP);
         Utils.closeModal('changePasswordModal');
         Utils.showToast('Password changed successfully!', 'success');
         changePasswordForm.reset();
       });
     }
+
+    window.addEventListener('cloud_sync', (e) => {
+      console.log('App reacting to cloud_sync event');
+      // Re-render the current view to reflect real-time updates
+      if (this.currentView === 'dashboardView' && window.Dashboard) window.Dashboard.render();
+      if (this.currentView === 'billingView' && window.Billing) window.Billing.render();
+      if (this.currentView === 'customersView' && window.Customers) window.Customers.render();
+      if (this.currentView === 'framesView' && window.Frames) window.Frames.render();
+      if (this.currentView === 'lensesView' && window.Lenses) window.Lenses.render();
+      if (this.currentView === 'duesView' && window.Dues) window.Dues.render();
+      if (this.currentView === 'reportsView' && window.Reports) window.Reports.render();
+      if (this.currentView === 'settingsView' && window.Settings) window.Settings.render();
+    });
   },
 
   setupKeyboardShortcuts() {
@@ -239,14 +252,14 @@ export const App = {
     });
   },
 
-  applySavedTheme() {
-    const settings = window.db ? window.db.getSettings() : { theme: 'dark' };
+  async applySavedTheme() {
+    const settings = window.db ? await window.db.getSettings() : { theme: 'dark' };
     const theme = settings.theme || 'dark';
     document.body.setAttribute('data-theme', theme);
   },
 
-  toggleTheme() {
-    const settings = window.db ? window.db.getSettings() : { theme: 'dark' };
+  async toggleTheme() {
+    const settings = window.db ? await window.db.getSettings() : { theme: 'dark' };
     const newTheme = settings.theme === 'light' ? 'dark' : 'light';
     settings.theme = newTheme;
     if (window.db) window.db.saveSettings(settings);
@@ -254,8 +267,8 @@ export const App = {
     Utils.showToast(`Switched to ${newTheme.toUpperCase()} theme`, 'info');
   },
 
-  updateShopBranding() {
-    const settings = window.db ? window.db.getSettings() : { shopName: 'KHUSHI OPTICS' };
+  async updateShopBranding() {
+    const settings = window.db ? await window.db.getSettings() : { shopName: 'KHUSHI OPTICS' };
     document.querySelectorAll('.shop-brand-name').forEach(el => el.textContent = settings.shopName || 'KHUSHI OPTICS');
     document.querySelectorAll('.shop-brand-phone').forEach(el => el.textContent = `${settings.phone1 || '9824735065'} | ${settings.phone2 || '9265778527'}`);
     document.querySelectorAll('.shop-brand-address').forEach(el => el.textContent = settings.address || '');
@@ -269,7 +282,7 @@ export const App = {
     }
   },
 
-  handleGlobalSearch(query) {
+  async handleGlobalSearch(query) {
     if (!query) {
       const dropdown = document.getElementById('globalSearchResults');
       if (dropdown) dropdown.style.display = 'none';
@@ -277,9 +290,9 @@ export const App = {
     }
 
     const q = query.toLowerCase();
-    const customers = window.db ? window.db.getCustomers().filter(c => c.name.toLowerCase().includes(q) || c.mobile.includes(q)) : [];
-    const frames = window.db ? window.db.getFrames().filter(f => f.brand.toLowerCase().includes(q) || f.model.toLowerCase().includes(q) || f.id.toLowerCase().includes(q)) : [];
-    const invoices = window.db ? window.db.getInvoices().filter(i => i.invoiceNumber.toLowerCase().includes(q) || i.customerName.toLowerCase().includes(q)) : [];
+    const customers = window.db ? await window.db.getCustomers().filter(c => c.name.toLowerCase().includes(q) || c.mobile.includes(q)) : [];
+    const frames = window.db ? await window.db.getFrames().filter(f => f.brand.toLowerCase().includes(q) || f.model.toLowerCase().includes(q) || f.id.toLowerCase().includes(q)) : [];
+    const invoices = window.db ? await window.db.getInvoices().filter(i => i.invoiceNumber.toLowerCase().includes(q) || i.customerName.toLowerCase().includes(q)) : [];
 
     let html = '';
     

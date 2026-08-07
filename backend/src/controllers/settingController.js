@@ -1,13 +1,28 @@
-const db = require('../database/db');
+const Settings = require('../models/Settings');
+const socketService = require('../utils/socketService');
 
 const settingController = {
-  getSettings: (req, res) => {
-    res.json({ success: true, data: db.getSettings() });
+  getSettings: async (req, res) => {
+    try {
+      const settingsDoc = await Settings.findOne({ key: 'shop_settings' }).lean();
+      res.json({ success: true, data: settingsDoc ? settingsDoc.data : {} });
+    } catch (err) {
+      res.status(500).json({ success: false, message: 'Failed to fetch settings' });
+    }
   },
 
-  updateSettings: (req, res) => {
-    const updated = db.updateSettings(req.body);
-    res.json({ success: true, message: 'Settings saved successfully', data: updated });
+  updateSettings: async (req, res) => {
+    try {
+      const updated = await Settings.findOneAndUpdate(
+        { key: 'shop_settings' },
+        { data: req.body },
+        { upsert: true, new: true }
+      );
+      socketService.broadcastSync('settings', 'update', updated.data);
+      res.json({ success: true, message: 'Settings saved successfully', data: updated.data });
+    } catch (err) {
+      res.status(500).json({ success: false, message: 'Failed to update settings' });
+    }
   }
 };
 

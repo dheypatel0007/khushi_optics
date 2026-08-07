@@ -3,7 +3,7 @@
  */
 
 export const Products = {
-  render() {
+  async render() {
     if (window.Frames) window.Frames.render();
     if (window.Lenses) window.Lenses.render();
   }

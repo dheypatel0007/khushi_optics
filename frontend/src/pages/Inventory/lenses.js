@@ -5,12 +5,11 @@
 import { Utils } from '../../utils/utils.js';
 
 export const Lenses = {
-  render() {
+  async render() {
     this.renderLensTable();
   },
-
-  renderLensTable(filterQuery = '') {
-    const lenses = window.db ? window.db.getLenses() : [];
+  async renderLensTable(filterQuery = '') {
+    const lenses = window.db ? await window.db.getLenses() : [];
     const tbody = document.getElementById('lensesTbody');
     if (!tbody) return;
 
@@ -67,7 +66,7 @@ export const Lenses = {
     tbody.innerHTML = html;
   },
 
-  openAddLensModal() {
+  async openAddLensModal() {
     const form = document.getElementById('lensModalForm');
     if (form) form.reset();
     const title = document.getElementById('lensModalTitle');
@@ -76,9 +75,8 @@ export const Lenses = {
     if (id) id.value = '';
     Utils.openModal('lensModal');
   },
-
-  openEditLensModal(id) {
-    const lens = window.db ? window.db.getLensById(id) : null;
+  async openEditLensModal(id) {
+    const lens = window.db ? await window.db.getLensById(id) : null;
     if (!lens) return;
 
     const title = document.getElementById('lensModalTitle');
@@ -103,8 +101,7 @@ export const Lenses = {
 
     Utils.openModal('lensModal');
   },
-
-  saveLensFromForm() {
+  async saveLensFromForm() {
     const company = document.getElementById('lensCompany').value.trim();
     const type = document.getElementById('lensType').value;
     const sellingPrice = parseFloat(document.getElementById('lensSellingPrice').value) || 0;
@@ -141,13 +138,31 @@ export const Lenses = {
     Utils.showToast(`Lens ${company} (${type}) saved!`, 'success');
     this.renderLensTable();
   },
-
-  deleteLens(id) {
+  async deleteLens(id) {
+    const role = sessionStorage.getItem('khushi_user_role') || (window.db?.getAdmin()?.role) || 'Admin';
+    if (role === 'Staff') {
+      Utils.showToast('Access Denied: Staff accounts cannot delete inventory items.', 'error');
+      return;
+    }
     if (confirm('Delete this lens from inventory?')) {
       if (window.db) window.db.deleteLens(id);
       Utils.showToast('Lens removed', 'info');
       this.renderLensTable();
     }
+  },
+  async exportLensesExcel() {
+    const lenses = window.db ? await window.db.getLenses() : [];
+    if (!lenses.length) return Utils.showToast('No lenses in stock to export', 'warning');
+    const rows = lenses.map(l => ({
+      'Lens ID': l.id, 'Brand / Company': l.company, 'Type': l.type, 'Features': (l.features || []).join(', '), 'Index': l.index || '', 'Selling Price (₹)': l.sellingPrice || 0, 'Stock Qty': l.quantity || 0
+    }));
+    Utils.exportToExcel(`KHUSHI_OPTICS_Lenses_Inventory_${new Date().toISOString().slice(0, 10)}.xlsx`, rows, 'Lenses Inventory');
+  },
+  async exportLensesCSV() {
+    const lenses = window.db ? await window.db.getLenses() : [];
+    if (!lenses.length) return Utils.showToast('No lenses to export', 'warning');
+    const rows = lenses.map(l => ({ ID: l.id, Company: l.company, Type: l.type, Features: (l.features || []).join(', '), Price: l.sellingPrice, Qty: l.quantity }));
+    Utils.exportToCSV(`KHUSHI_OPTICS_Lenses_Inventory_${new Date().toISOString().slice(0, 10)}.csv`, rows);
   }
 };
 

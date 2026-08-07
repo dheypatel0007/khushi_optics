@@ -1,14 +1,36 @@
+const http = require('http');
+const socketIo = require('socket.io');
 const app = require('./app');
 const env = require('./config/env');
 const logger = require('./utils/logger');
+const db = require('./database/db');
+const socketService = require('./utils/socketService');
 
-const server = app.listen(env.port, () => {
-  logger.info(`===================================================`);
-  logger.info(` KHUSHI OPTICS BACKEND SERVER RUNNING`);
-  logger.info(` Environment: ${env.nodeEnv}`);
-  logger.info(` Local API:    http://localhost:${env.port}/api`);
-  logger.info(` Health Check: http://localhost:${env.port}/api/health`);
-  logger.info(`===================================================`);
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+  }
+});
+
+// Attach socket server
+socketService.setSocketServer(io);
+
+// Initialize DB and Start Server
+db.initDatabase().then(() => {
+  server.listen(env.port, () => {
+    logger.info(`===================================================`);
+    logger.info(` KHUSHI OPTICS ENTERPRISE CLOUD SERVER RUNNING`);
+    logger.info(` Environment: ${env.nodeEnv}`);
+    logger.info(` Local API:    http://localhost:${env.port}/api`);
+    logger.info(` Real-time WS: ws://localhost:${env.port}`);
+    logger.info(`===================================================`);
+  });
+}).catch(err => {
+  logger.error('Failed to initialize database, shutting down...', err);
+  process.exit(1);
 });
 
 process.on('unhandledRejection', (err) => {

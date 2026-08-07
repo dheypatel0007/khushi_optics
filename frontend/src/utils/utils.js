@@ -74,6 +74,22 @@ export const Utils = {
     }
   },
 
+  showLoading(isVisible) {
+    let loader = document.getElementById('globalLoadingSpinner');
+    if (!loader) {
+      loader = document.createElement('div');
+      loader.id = 'globalLoadingSpinner';
+      loader.innerHTML = `
+        <div style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15, 23, 42, 0.7); z-index:9999; display:flex; justify-content:center; align-items:center; backdrop-filter:blur(4px);">
+          <div style="width:40px; height:40px; border:4px solid #cbd5e1; border-top-color:#38bdf8; border-radius:50%; animation:spin 1s linear infinite;"></div>
+          <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+        </div>
+      `;
+      document.body.appendChild(loader);
+    }
+    loader.style.display = isVisible ? 'flex' : 'none';
+  },
+
   recommendLensType(reSphVal, leSphVal) {
     const maxPower = Math.max(Math.abs(parseFloat(reSphVal) || 0), Math.abs(parseFloat(leSphVal) || 0));
     if (maxPower >= 6.0) return { index: '1.67 / 1.74 Ultra High Index', recommendation: 'Ultra-thin lightweight lens required for high prescription' };
@@ -110,6 +126,29 @@ export const Utils = {
         </div>
       </div>
     `;
+  },
+
+  exportToExcel(filename, rows, sheetName = 'Report Data') {
+    if (!rows || !rows.length) {
+      Utils.showToast('No data to export to Excel', 'warning');
+      return;
+    }
+    try {
+      if (window.XLSX && window.XLSX.utils) {
+        const worksheet = window.XLSX.utils.json_to_sheet(rows);
+        const workbook = window.XLSX.utils.book_new();
+        window.XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+        const fileOut = filename.endsWith('.xlsx') ? filename : `${filename}.xlsx`;
+        window.XLSX.writeFile(workbook, fileOut);
+        Utils.showToast('Excel (.xlsx) file downloaded successfully!', 'success');
+      } else {
+        Utils.exportToCSV(filename.replace('.xlsx', '.csv'), rows);
+      }
+    } catch (e) {
+      console.error('Excel Export Error:', e);
+      Utils.showToast('Generating standard CSV format...', 'info');
+      Utils.exportToCSV(filename.replace('.xlsx', '.csv'), rows);
+    }
   },
 
   exportToCSV(filename, rows) {

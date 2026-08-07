@@ -9,6 +9,7 @@ const inventoryRoutes = require('./inventory');
 const reportRoutes = require('./reports');
 const settingRoutes = require('./settings');
 const healthRoutes = require('./health');
+const syncRoutes = require('./sync');
 
 router.use('/auth', authRoutes);
 router.use('/customers', customerRoutes);
@@ -18,5 +19,6 @@ router.use('/inventory', inventoryRoutes);
 router.use('/reports', reportRoutes);
 router.use('/settings', settingRoutes);
 router.use('/health', healthRoutes);
+router.use('/sync', syncRoutes);
 
 module.exports = router;

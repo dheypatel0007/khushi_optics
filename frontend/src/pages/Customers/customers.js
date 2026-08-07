@@ -7,12 +7,11 @@ import { Utils } from '../../utils/utils.js';
 export const Customers = {
   activeCustomerId: null,
 
-  render() {
+  async render() {
     this.renderCustomerTable();
   },
-
-  renderCustomerTable(filterQuery = '') {
-    const customers = window.db ? window.db.getCustomers() : [];
+  async renderCustomerTable(filterQuery = '') {
+    const customers = window.db ? await window.db.getCustomers() : [];
     const tbody = document.getElementById('customersTbody');
     if (!tbody) return;
 
@@ -67,7 +66,7 @@ export const Customers = {
     tbody.innerHTML = html;
   },
 
-  openAddCustomerModal() {
+  async openAddCustomerModal() {
     this.activeCustomerId = null;
     const form = document.getElementById('customerModalForm');
     if (form) form.reset();
@@ -77,9 +76,8 @@ export const Customers = {
     if (idEl) idEl.value = '';
     Utils.openModal('customerModal');
   },
-
-  openEditCustomerModal(id) {
-    const customer = window.db ? window.db.getCustomerById(id) : null;
+  async openEditCustomerModal(id) {
+    const customer = window.db ? await window.db.getCustomerById(id) : null;
     if (!customer) return;
 
     this.activeCustomerId = id;
@@ -110,8 +108,7 @@ export const Customers = {
 
     Utils.openModal('customerModal');
   },
-
-  saveCustomerFromForm() {
+  async saveCustomerFromForm() {
     const name = document.getElementById('custName').value.trim();
     const mobile = document.getElementById('custMobile').value.trim();
 
@@ -154,6 +151,11 @@ export const Customers = {
   },
 
   async deleteCustomer(id) {
+    const role = sessionStorage.getItem('khushi_user_role') || (window.db?.getAdmin()?.role) || 'Admin';
+    if (role === 'Staff') {
+      Utils.showToast('Access Denied: Staff accounts cannot delete patient records.', 'error');
+      return;
+    }
     if (confirm('Are you sure you want to delete this customer?\nA full database backup file will be exported to your computer before deleting.')) {
       if (window.Settings && window.Settings.triggerQuickBackup) {
         Utils.showToast('Step 1: Exporting backup file...', 'info');
@@ -166,6 +168,11 @@ export const Customers = {
   },
 
   async deleteAllCustomers() {
+    const role = sessionStorage.getItem('khushi_user_role') || (window.db?.getAdmin()?.role) || 'Admin';
+    if (role === 'Staff') {
+      Utils.showToast('Access Denied: Staff accounts cannot delete patient records.', 'error');
+      return;
+    }
     if (confirm('WARNING: Are you sure you want to DELETE ALL CUSTOMERS?\nA full database backup file will be saved to your computer first.')) {
       if (confirm('Final Confirmation: Export backup and erase ALL customer records?')) {
         if (window.Settings && window.Settings.triggerQuickBackup) {
@@ -179,11 +186,11 @@ export const Customers = {
     }
   },
 
-  viewCustomerHistory(id) {
-    const customer = window.db ? window.db.getCustomerById(id) : null;
+  async viewCustomerHistory(id) {
+    const customer = window.db ? await window.db.getCustomerById(id) : null;
     if (!customer) return;
 
-    const invoices = window.db ? window.db.getInvoices().filter(inv => inv.customerId === id || inv.customerPhone === customer.mobile) : [];
+    const invoices = window.db ? await window.db.getInvoices().filter(inv => inv.customerId === id || inv.customerPhone === customer.mobile) : [];
     const modalBody = document.getElementById('customerHistoryModalBody');
     if (!modalBody) return;
 
@@ -282,6 +289,37 @@ export const Customers = {
     `;
 
     Utils.openModal('customerHistoryModal');
+  },
+  async exportCustomersExcel() {
+    const customers = window.db ? await window.db.getCustomers() : [];
+    if (!customers.length) {
+      Utils.showToast('No customer records to export', 'warning');
+      return;
+    }
+    const rows = customers.map(c => ({
+      'Customer ID': c.id,
+      'Full Name': c.name,
+      'Mobile Number': c.mobile,
+      'Age': c.age || '',
+      'Gender': c.gender || '',
+      'Address': c.address || '',
+      'Doctor Referred': c.doctorName || '',
+      'RE SPH': c.prescription?.rightEye?.sph || '0.00',
+      'RE CYL': c.prescription?.rightEye?.cyl || '0.00',
+      'LE SPH': c.prescription?.leftEye?.sph || '0.00',
+      'LE CYL': c.prescription?.leftEye?.cyl || '0.00',
+      'Remarks': c.remarks || '',
+      'Registered Date': Utils.formatDate(c.createdAt)
+    }));
+    Utils.exportToExcel(`KHUSHI_OPTICS_Customers_${new Date().toISOString().slice(0, 10)}.xlsx`, rows, 'Customers');
+  },
+  async exportCustomersCSV() {
+    const customers = window.db ? await window.db.getCustomers() : [];
+    if (!customers.length) return Utils.showToast('No customers to export', 'warning');
+    const rows = customers.map(c => ({
+      ID: c.id, Name: c.name, Mobile: c.mobile, Age: c.age || '', Gender: c.gender || '', Address: c.address || '', Doctor: c.doctorName || ''
+    }));
+    Utils.exportToCSV(`KHUSHI_OPTICS_Customers_${new Date().toISOString().slice(0, 10)}.csv`, rows);
   }
 };
 

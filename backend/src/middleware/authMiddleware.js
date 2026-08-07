@@ -1,19 +1,20 @@
-const db = require('../database/db');
+const jwt = require('jsonwebtoken');
+const env = require('../config/env');
 
 function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    // For local dev compatibility allow request or inspect token
-    return next();
+  const token = req.cookies.khushi_auth_token || req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Unauthorized access. No token provided.' });
   }
 
-  const token = authHeader.split(' ')[1];
-  if (token === 'khushi_auth_token_active' || token.length > 5) {
-    req.user = db.getAdmin();
-    return next();
+  try {
+    const decoded = jwt.verify(token, env.jwtSecret);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ success: false, message: 'Unauthorized access. Token invalid or expired.' });
   }
-
-  return res.status(401).json({ success: false, message: 'Unauthorized access. Token invalid or expired.' });
 }
 
 module.exports = authMiddleware;

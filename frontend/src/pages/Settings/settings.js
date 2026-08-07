@@ -5,13 +5,13 @@
 import { Utils } from '../../utils/utils.js';
 
 export const Settings = {
-  render() {
+  async render() {
     this.loadSettingsToForm();
     this.renderBranchesTable();
   },
 
-  loadSettingsToForm() {
-    const s = window.db ? window.db.getSettings() : { shopName: 'KHUSHI OPTICS' };
+  async loadSettingsToForm() {
+    const s = window.db ? await window.db.getSettings() : { shopName: 'KHUSHI OPTICS' };
     const elName = document.getElementById('setShopName');
     const elP1 = document.getElementById('setPhone1');
     const elP2 = document.getElementById('setPhone2');
@@ -34,9 +34,8 @@ export const Settings = {
     if (elGstTog) elGstTog.checked = s.gstEnabledDefault !== false;
     if (elGstPct) elGstPct.value = s.defaultGstPercent || 12;
   },
-
-  saveSettingsFromForm() {
-    const s = window.db ? window.db.getSettings() : {};
+  async saveSettingsFromForm() {
+    const s = window.db ? await window.db.getSettings() : {};
     s.shopName = document.getElementById('setShopName').value.trim();
     s.phone1 = document.getElementById('setPhone1').value.trim();
     s.phone2 = document.getElementById('setPhone2').value.trim();
@@ -57,8 +56,8 @@ export const Settings = {
     Utils.showToast('Shop Profile & UPI Details updated!', 'success');
   },
 
-  renderBranchesTable() {
-    const branches = window.db ? window.db.getBranches() : [];
+  async renderBranchesTable() {
+    const branches = window.db ? await window.db.getBranches() : [];
     const container = document.getElementById('setBranchesList');
     if (!container) return;
 
@@ -77,8 +76,7 @@ export const Settings = {
       </div>
     `).join('');
   },
-
-  openAddBranchModal() {
+  async openAddBranchModal() {
     const name = prompt('Enter new Shop Branch Name (e.g. Sanand Branch, Satellite Branch):');
     if (!name || !name.trim()) return;
 
@@ -126,7 +124,7 @@ export const Settings = {
 
   async triggerClearDataWithAutoBackup() {
     const pass = prompt('WARNING: Clear All Data will reset your Customers, Stock & Billing records.\nEnter your admin password (dheypatel0007) to proceed:');
-    const admin = window.db ? window.db.getAdmin() : { passwordHash: 'dheypatel0007' };
+    const admin = window.db ? await window.db.getAdmin() : { passwordHash: 'dheypatel0007' };
 
     if (pass !== admin.passwordHash) {
       Utils.showToast('Incorrect Admin Password! Data reset cancelled.', 'error');

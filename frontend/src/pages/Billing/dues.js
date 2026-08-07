@@ -5,12 +5,12 @@
 import { Utils } from '../../utils/utils.js';
 
 export const Dues = {
-  render() {
+  async render() {
     this.renderDuesTable();
   },
 
-  renderDuesTable(filterQuery = '') {
-    const invoices = window.db ? window.db.getInvoices() : [];
+  async renderDuesTable(filterQuery = '') {
+    const invoices = window.db ? await window.db.getInvoices() : [];
     const tbody = document.getElementById('duesTbody');
     if (!tbody) return;
 
@@ -76,8 +76,8 @@ export const Dues = {
     tbody.innerHTML = html;
   },
 
-  openCollectPaymentModal(invoiceNumber) {
-    const inv = window.db ? window.db.getInvoiceByNumber(invoiceNumber) : null;
+  async openCollectPaymentModal(invoiceNumber) {
+    const inv = window.db ? await window.db.getInvoiceByNumber(invoiceNumber) : null;
     if (!inv) return;
 
     document.getElementById('collectInvNum').value = inv.invoiceNumber;
@@ -106,11 +106,11 @@ export const Dues = {
     this.renderDuesTable();
   },
 
-  sendWhatsAppReminder(invoiceNumber) {
-    const inv = window.db ? window.db.getInvoiceByNumber(invoiceNumber) : null;
+  async sendWhatsAppReminder(invoiceNumber) {
+    const inv = window.db ? await window.db.getInvoiceByNumber(invoiceNumber) : null;
     if (!inv) return;
 
-    const shop = window.db ? window.db.getSettings() : { shopName: 'KHUSHI OPTICS' };
+    const shop = window.db ? await window.db.getSettings() : { shopName: 'KHUSHI OPTICS' };
     const text = `*Payment Reminder - KHUSHI OPTICS*\n` +
       `Dear ${inv.customerName},\n` +
       `This is a friendly reminder regarding your outstanding payment for Invoice *${inv.invoiceNumber}*.\n\n` +
@@ -126,6 +126,31 @@ export const Dues = {
     const fullPhone = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
     const url = `https://wa.me/${fullPhone}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
+  },
+
+  async exportDuesExcel() {
+    const invoices = window.db ? await window.db.getInvoices() : [];
+    const pendingBills = invoices.filter(inv => parseFloat(inv.balanceDue || 0) > 0);
+    if (!pendingBills.length) return Utils.showToast('No pending due payments to export!', 'info');
+    const rows = pendingBills.map(inv => ({
+      'Invoice Number': inv.invoiceNumber,
+      'Billing Date': Utils.formatDate(inv.date),
+      'Customer Name': inv.customerName,
+      'Mobile Number': inv.customerPhone,
+      'Total Bill (₹)': Number(inv.netTotal || 0),
+      'Amount Paid (₹)': Number(inv.paidAmount || 0),
+      'Outstanding Balance Due (₹)': Number(inv.balanceDue || 0),
+      'Last Payment Method': inv.paymentMethod || 'UPI'
+    }));
+    Utils.exportToExcel(`KHUSHI_OPTICS_Pending_Dues_${new Date().toISOString().slice(0, 10)}.xlsx`, rows, 'Pending Dues');
+  },
+
+  async exportDuesCSV() {
+    const invoices = window.db ? await window.db.getInvoices() : [];
+    const pendingBills = invoices.filter(inv => parseFloat(inv.balanceDue || 0) > 0);
+    if (!pendingBills.length) return Utils.showToast('No pending dues to export!', 'info');
+    const rows = pendingBills.map(inv => ({ Invoice: inv.invoiceNumber, Date: Utils.formatDate(inv.date), Name: inv.customerName, Phone: inv.customerPhone, NetTotal: inv.netTotal, Paid: inv.paidAmount, Due: inv.balanceDue }));
+    Utils.exportToCSV(`KHUSHI_OPTICS_Pending_Dues_${new Date().toISOString().slice(0, 10)}.csv`, rows);
   }
 };
 
