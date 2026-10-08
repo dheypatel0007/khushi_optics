@@ -213,15 +213,15 @@ export const Reports = {
     }));
   },
 
-  exportSalesReportExcel() {
-    const exportRows = this.getExportRows();
+  async exportSalesReportExcel() {
+    const exportRows = await this.getExportRows();
     if (!exportRows) return;
     const filename = `KHUSHI_OPTICS_Sales_Report_${this.activePeriod}_${new Date().toISOString().slice(0, 10)}.xlsx`;
     Utils.exportToExcel(filename, exportRows, 'Sales Report');
   },
 
-  exportSalesReportCSV() {
-    const exportRows = this.getExportRows();
+  async exportSalesReportCSV() {
+    const exportRows = await this.getExportRows();
     if (!exportRows) return;
     const filename = `KHUSHI_OPTICS_Sales_Report_${this.activePeriod}_${new Date().toISOString().slice(0, 10)}.csv`;
     Utils.exportToCSV(filename, exportRows);

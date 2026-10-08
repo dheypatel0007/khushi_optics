@@ -223,7 +223,7 @@ export const Customers = {
                 <td>${Utils.formatCurrency(inv.balanceDue)}</td>
                 <td><span class="badge ${inv.balanceDue > 0 ? 'badge-warning' : 'badge-success'}">${inv.balanceDue > 0 ? 'Pending' : 'Paid'}</span></td>
                 <td>
-                  <button class="btn btn-sm btn-secondary" onclick="Utils.closeModal('customerHistoryModal'); window.Billing.viewInvoiceDetails('${inv.invoiceNumber}');">
+                  <button class="btn btn-sm btn-secondary" onclick="Utils.closeModal('customerHistoryModal'); window.Billing.printInvoice('${inv.invoiceNumber}');">
                     View Bill
                   </button>
                 </td>

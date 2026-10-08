@@ -180,7 +180,7 @@ export const Dashboard = {
         <td><span class="badge badge-info">${inv.paymentMethod}</span></td>
         <td><span class="badge ${inv.paymentStatus === 'Paid' ? 'badge-success' : 'badge-warning'}">${inv.paymentStatus}</span></td>
         <td>
-          <button class="btn btn-sm btn-secondary" onclick="Billing.viewInvoiceDetails('${inv.invoiceNumber}');">View Bill</button>
+          <button class="btn btn-sm btn-secondary" onclick="Billing.printInvoice('${inv.invoiceNumber}');">View Bill</button>
         </td>
       </tr>
     `).join('');

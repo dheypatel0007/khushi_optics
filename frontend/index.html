@@ -10,11 +10,10 @@
   <link rel="stylesheet" href="/src/styles/styles.css">
   <link rel="stylesheet" href="/src/styles/invoice.css">
 
-  <!-- Chart.js, html2pdf, SheetJS (Excel) & Socket.IO Bundles -->
+  <!-- Chart.js, html2pdf, SheetJS (Excel) Bundles -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
 
 <body data-theme="dark">
@@ -548,6 +547,12 @@
                     <option value="5">5% GST</option>
                   </select>
                 </div>
+                <div class="flex items-center gap-3 mt-2 flex-wrap">
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="posRoundOffToggle" checked onchange="Billing.handleRoundOffToggle(this.checked);" class="checkbox-accent">
+                    <span class="font-bold text-sm">Auto Round-Off Grand Total</span>
+                  </label>
+                </div>
               </div>
 
               <!-- Step 6: Payment Method & Remarks -->
@@ -578,7 +583,7 @@
                   <div class="form-group">
                     <label class="form-label">Paid Amount (₹)</label>
                     <input type="number" id="posPaidAmountInput" class="form-control" placeholder="Amount collected"
-                      oninput="Billing.recalculateTotals();">
+                      oninput="this.dataset.modified='true'; Billing.recalculateTotals();">
                   </div>
                 </div>
 
@@ -1431,7 +1436,8 @@
       <div class="modal-footer modal-header-slate">
         <button class="btn btn-secondary" id="invoiceModalWhatsappBtn">WhatsApp Invoice</button>
         <button class="btn btn-secondary" id="invoiceModalPdfBtn">Download PDF</button>
-        <button class="btn btn-primary" id="invoiceModalPrintBtn">Print Invoice</button>
+        <button class="btn btn-info" id="invoiceModalCustomerBillBtn">Print Customer Bill</button>
+        <button class="btn btn-primary" id="invoiceModalPrintBtn">Print Tax Invoice</button>
       </div>
     </div>
   </div>

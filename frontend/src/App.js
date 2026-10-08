@@ -35,7 +35,7 @@ export const App = {
     const appView = document.getElementById('appContainer');
     if (loginView) loginView.style.display = 'flex';
     if (appView) appView.style.display = 'none';
-    
+
     const userField = document.getElementById('loginUsername');
     const passField = document.getElementById('loginPassword');
     if (userField && !userField.value) userField.value = '';
@@ -218,18 +218,7 @@ export const App = {
       });
     }
 
-    window.addEventListener('cloud_sync', (e) => {
-      console.log('App reacting to cloud_sync event');
-      // Re-render the current view to reflect real-time updates
-      if (this.currentView === 'dashboardView' && window.Dashboard) window.Dashboard.render();
-      if (this.currentView === 'billingView' && window.Billing) window.Billing.render();
-      if (this.currentView === 'customersView' && window.Customers) window.Customers.render();
-      if (this.currentView === 'framesView' && window.Frames) window.Frames.render();
-      if (this.currentView === 'lensesView' && window.Lenses) window.Lenses.render();
-      if (this.currentView === 'duesView' && window.Dues) window.Dues.render();
-      if (this.currentView === 'reportsView' && window.Reports) window.Reports.render();
-      if (this.currentView === 'settingsView' && window.Settings) window.Settings.render();
-    });
+
   },
 
   setupKeyboardShortcuts() {
@@ -295,7 +284,7 @@ export const App = {
     const invoices = window.db ? await window.db.getInvoices().filter(i => i.invoiceNumber.toLowerCase().includes(q) || i.customerName.toLowerCase().includes(q)) : [];
 
     let html = '';
-    
+
     if (customers.length) {
       html += `<div class="search-category-title">Customers</div>`;
       customers.slice(0, 3).forEach(c => {
@@ -308,7 +297,7 @@ export const App = {
     if (invoices.length) {
       html += `<div class="search-category-title">Invoices</div>`;
       invoices.slice(0, 3).forEach(inv => {
-        html += `<div class="search-result-item" onclick="App.navigateTo('billingView'); window.Billing.viewInvoiceDetails('${inv.invoiceNumber}'); App.closeGlobalSearch();">
+        html += `<div class="search-result-item" onclick="App.navigateTo('billingView'); window.Billing.printInvoice('${inv.invoiceNumber}'); App.closeGlobalSearch();">
           <strong>${inv.invoiceNumber}</strong> - ${inv.customerName} (${Utils.formatCurrency(inv.netTotal)})
         </div>`;
       });

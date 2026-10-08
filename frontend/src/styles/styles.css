@@ -2145,3 +2145,48 @@ table {
     margin: 2% auto !important;
   }
 }
+/* Customer Modal Rx Table Styling */
+.rx-matrix-display {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.rx-table {
+  width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  box-sizing: border-box;
+}
+
+.rx-table th,
+.rx-table td {
+  box-sizing: border-box;
+  padding: 8px 4px;
+  vertical-align: middle;
+}
+
+.rx-table th:first-child,
+.rx-table td:first-child {
+  width: 32%;
+  text-align: left;
+}
+
+.rx-table th:not(:first-child),
+.rx-table td:not(:first-child) {
+  width: 13.6%;
+  text-align: center;
+}
+
+.rx-table th {
+  border-bottom: 1px solid #334155;
+  color: #f8fafc;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.rx-table td {
+  color: #e2e8f0;
+  font-size: 0.85rem;
+}

@@ -331,12 +331,20 @@ export const Billing = {
       remarks
     };
 
-    const savedInvoice = window.db ? window.db.saveInvoice(invoiceRecord) : invoiceRecord;
-    Utils.showToast(`Invoice ${savedInvoice.invoiceNumber} generated!`, 'success');
+    try {
+      const savedInvoice = window.db ? window.db.saveInvoice(invoiceRecord) : invoiceRecord;
+      Utils.showToast(`Invoice ${savedInvoice.invoiceNumber} generated!`, 'success');
 
-    this.viewInvoiceDetails(savedInvoice.invoiceNumber);
-    this.autoSavePDFToFile(savedInvoice);
-    this.resetBillingForm();
+      await this.printInvoice(savedInvoice.invoiceNumber);
+
+      // Don't await autoSave, let it run in background
+      this.autoSavePDFToFile(savedInvoice).catch(e => console.error(e));
+
+      await this.resetBillingForm();
+    } catch (err) {
+      console.error("Error in generateAndSaveInvoice:", err);
+      Utils.showToast("An error occurred while generating the invoice.", "error");
+    }
   },
   async resetBillingForm() {
     this.activeInvoice = {
@@ -383,7 +391,7 @@ export const Billing = {
     const shop = window.db ? await window.db.getSettings() : { shopName: 'KHUSHI OPTICS' };
     const container = document.getElementById('printableInvoiceContainer');
     if (!container) return;
-    
+
     container.innerHTML = await this.generateInvoiceHtml(invoice, shop, true);
 
     const printBtn = document.getElementById('invoiceModalPrintBtn');
@@ -411,8 +419,9 @@ export const Billing = {
   async generateInvoiceHtml(invoice, shop, isPrint = false) {
     const shopData = shop || (window.db ? await window.db.getSettings() : { shopName: 'KHUSHI OPTICS' });
     const rx = invoice.prescription || { rightEye: {}, leftEye: {} };
-    const dateFormatted = Utils.formatDateTime(invoice.date);
-
+    const d = new Date(invoice.date);
+    const dateStr = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
     let itemsHtml = '';
     invoice.items.forEach(item => {
       itemsHtml += `
@@ -425,6 +434,22 @@ export const Billing = {
       `;
     });
 
+    const formatRx = (val) => {
+      if (val === undefined || val === null || val === '') return '0.00';
+      const str = String(val).trim();
+      const num = parseFloat(str);
+      if (isNaN(num)) return str;
+      let formatted = num.toFixed(2);
+      if (str.startsWith('+') && num > 0) formatted = '+' + formatted;
+      return formatted;
+    };
+
+    const formatAxis = (val) => {
+      if (val === undefined || val === null || val === '') return '0°';
+      const str = String(val).trim().replace(/[°*]/g, '');
+      return str + '°';
+    };
+
     const qrCodeHtml = Utils.generateUPIQRCode(shopData.upiId || 'dheypatel2690-1@okicici', shopData.shopName, invoice.netTotal, invoice.invoiceNumber);
 
     return `
@@ -435,10 +460,15 @@ export const Billing = {
             <div class="inv-sub font-mono">${shopData.address}</div>
             <div class="inv-sub">Phone: <strong>${shopData.phone1}</strong> / <strong>${shopData.phone2}</strong></div>
           </div>
-          <div class="inv-meta">
+          <div class="inv-title-container">
             <div class="inv-title">TAX INVOICE</div>
+          </div>
+          <div class="inv-meta">
             <div class="inv-num">Inv #: <strong>${invoice.invoiceNumber}</strong></div>
-            <div class="inv-date">Date: ${dateFormatted}</div>
+            <div class="invoice-date">
+              <div>Date: ${dateStr}</div>
+              <div>${timeStr}</div>
+            </div>
             <div class="inv-status-tag ${invoice.balanceDue <= 0 ? 'paid' : 'due'}">${invoice.paymentStatus.toUpperCase()}</div>
           </div>
         </div>
@@ -468,19 +498,19 @@ export const Billing = {
               <tbody>
                 <tr>
                   <td><strong>R.E.</strong></td>
-                  <td>${rx.rightEye?.sph || '0.00'}</td>
-                  <td>${rx.rightEye?.cyl || '0.00'}</td>
-                  <td>${rx.rightEye?.axis || '0'}°</td>
-                  <td>${rx.rightEye?.add || '0.00'}</td>
-                  <td>${rx.rightEye?.pd || '31.5'}</td>
+                  <td>${formatRx(rx.rightEye?.sph)}</td>
+                  <td>${formatRx(rx.rightEye?.cyl)}</td>
+                  <td>${formatAxis(rx.rightEye?.axis)}</td>
+                  <td>${formatRx(rx.rightEye?.add)}</td>
+                  <td>${formatRx(rx.rightEye?.pd || '31.5')}</td>
                 </tr>
                 <tr>
                   <td><strong>L.E.</strong></td>
-                  <td>${rx.leftEye?.sph || '0.00'}</td>
-                  <td>${rx.leftEye?.cyl || '0.00'}</td>
-                  <td>${rx.leftEye?.axis || '0'}°</td>
-                  <td>${rx.leftEye?.add || '0.00'}</td>
-                  <td>${rx.leftEye?.pd || '31.5'}</td>
+                  <td>${formatRx(rx.leftEye?.sph)}</td>
+                  <td>${formatRx(rx.leftEye?.cyl)}</td>
+                  <td>${formatAxis(rx.leftEye?.axis)}</td>
+                  <td>${formatRx(rx.leftEye?.add)}</td>
+                  <td>${formatRx(rx.leftEye?.pd || '31.5')}</td>
                 </tr>
               </tbody>
             </table>
@@ -519,11 +549,11 @@ export const Billing = {
             ` : ''}
             ${invoice.gstEnabled ? `
               <div class="inv-total-line">
-                <span>CGST (${(invoice.gstPercent/2)}%):</span>
+                <span>CGST (${(invoice.gstPercent / 2)}%):</span>
                 <span>+ ${Utils.formatCurrency(invoice.cgstAmount)}</span>
               </div>
               <div class="inv-total-line">
-                <span>SGST (${(invoice.gstPercent/2)}%):</span>
+                <span>SGST (${(invoice.gstPercent / 2)}%):</span>
                 <span>+ ${Utils.formatCurrency(invoice.sgstAmount)}</span>
               </div>
             ` : ''}
@@ -568,10 +598,26 @@ export const Billing = {
     const validUntil = new Date(dateObj);
     validUntil.setMonth(validUntil.getMonth() + 6);
 
+    const formatRx = (val) => {
+      if (val === undefined || val === null || val === '') return '0.00';
+      const str = String(val).trim();
+      const num = parseFloat(str);
+      if (isNaN(num)) return str;
+      let formatted = num.toFixed(2);
+      if (str.startsWith('+') && num > 0) formatted = '+' + formatted;
+      return formatted;
+    };
+
+    const formatAxis = (val) => {
+      if (val === undefined || val === null || val === '') return '0°';
+      const str = String(val).trim().replace(/[°*]/g, '');
+      return str + '°';
+    };
+
     const container = document.getElementById('printableInvoiceContainer');
     if (!container) return;
     container.innerHTML = `
-      <div class="invoice-paper" style="max-width:550px; border:2px solid #0284c7; padding:1.75rem; background:#ffffff;">
+      <div class="invoice-paper" style="max-width:550px; border:2px solid #0284c7; padding:1.75rem; background:#ffffff; box-sizing: border-box;">
         <div style="text-align:center; border-bottom:2px solid #0284c7; padding-bottom:10px; margin-bottom:12px;">
           <h2 style="margin:0; color:#0284c7; font-size:1.5rem; font-weight:800;">${shop.shopName}</h2>
           <div style="font-size:11px; color:#475569;">OFFICIAL EYEWEAR WARRANTY & PRESCRIPTION CARD</div>
@@ -583,17 +629,29 @@ export const Billing = {
           <div style="text-align:right;">Inv #: <strong>${invoice.invoiceNumber}</strong></div>
         </div>
 
-        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:8px; margin-bottom:12px;">
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:8px; margin-bottom:12px; box-sizing: border-box; width: 100%;">
           <div style="font-size:10px; font-weight:bold; color:#0284c7; margin-bottom:4px;">PRESCRIPTION MATRIX (Rx)</div>
-          <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:center;">
+          <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:center; table-layout:fixed; box-sizing: border-box;">
             <tr style="background:#e0f2fe; color:#0369a1; font-weight:bold;">
-              <td>EYE</td><td>SPH</td><td>CYL</td><td>AXIS</td><td>ADD</td>
+              <td style="padding:4px; box-sizing:border-box;">EYE</td>
+              <td style="padding:4px; box-sizing:border-box;">SPH</td>
+              <td style="padding:4px; box-sizing:border-box;">CYL</td>
+              <td style="padding:4px; box-sizing:border-box;">AXIS</td>
+              <td style="padding:4px; box-sizing:border-box;">ADD</td>
             </tr>
             <tr>
-              <td><strong>R.E.</strong></td><td>${rx.rightEye?.sph || '0.00'}</td><td>${rx.rightEye?.cyl || '0.00'}</td><td>${rx.rightEye?.axis || '0'}°</td><td>${rx.rightEye?.add || '0.00'}</td>
+              <td style="padding:4px; box-sizing:border-box; border:1px solid #e2e8f0;"><strong>R.E.</strong></td>
+              <td style="padding:4px; box-sizing:border-box; border:1px solid #e2e8f0;">${formatRx(rx.rightEye?.sph)}</td>
+              <td style="padding:4px; box-sizing:border-box; border:1px solid #e2e8f0;">${formatRx(rx.rightEye?.cyl)}</td>
+              <td style="padding:4px; box-sizing:border-box; border:1px solid #e2e8f0;">${formatAxis(rx.rightEye?.axis)}</td>
+              <td style="padding:4px; box-sizing:border-box; border:1px solid #e2e8f0;">${formatRx(rx.rightEye?.add)}</td>
             </tr>
             <tr>
-              <td><strong>L.E.</strong></td><td>${rx.leftEye?.sph || '0.00'}</td><td>${rx.leftEye?.cyl || '0.00'}</td><td>${rx.leftEye?.axis || '0'}°</td><td>${rx.leftEye?.add || '0.00'}</td>
+              <td style="padding:4px; box-sizing:border-box; border:1px solid #e2e8f0;"><strong>L.E.</strong></td>
+              <td style="padding:4px; box-sizing:border-box; border:1px solid #e2e8f0;">${formatRx(rx.leftEye?.sph)}</td>
+              <td style="padding:4px; box-sizing:border-box; border:1px solid #e2e8f0;">${formatRx(rx.leftEye?.cyl)}</td>
+              <td style="padding:4px; box-sizing:border-box; border:1px solid #e2e8f0;">${formatAxis(rx.leftEye?.axis)}</td>
+              <td style="padding:4px; box-sizing:border-box; border:1px solid #e2e8f0;">${formatRx(rx.leftEye?.add)}</td>
             </tr>
           </table>
         </div>
@@ -617,32 +675,81 @@ export const Billing = {
     Utils.showToast('Pocket Warranty & Rx Card rendered!', 'info');
   },
 
-  printInvoice() {
-    if (window.electronAPI && window.electronAPI.printInvoice) {
-      window.electronAPI.printInvoice();
-    } else {
-      window.print();
+  async printInvoiceAction() {
+    Utils.showToast('Preparing invoice for print...', 'info');
+    
+    const container = document.getElementById('printableInvoiceContainer');
+    if (container) {
+      const images = container.querySelectorAll('img');
+      const promises = Array.from(images).map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise(resolve => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      });
+      await Promise.all(promises);
     }
+
+    setTimeout(() => {
+      if (window.electronAPI && window.electronAPI.printInvoice) {
+        window.electronAPI.printInvoice();
+      } else {
+        window.print();
+      }
+    }, 150);
   },
 
   async downloadInvoicePDF(invoice) {
     Utils.showToast('Generating high-quality A4 PDF...', 'info');
     const sourceEl = document.getElementById('invoicePaper') || document.getElementById('printableInvoiceContainer');
-    
+
     if (window.html2pdf && sourceEl) {
+      const images = sourceEl.querySelectorAll('img');
+      const promises = Array.from(images).map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise(resolve => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      });
+      await Promise.all(promises);
+
+      const parentNode = sourceEl.parentNode;
+      const nextSibling = sourceEl.nextSibling;
+      
+      const originalCss = sourceEl.style.cssText;
+      sourceEl.style.position = 'absolute';
+      sourceEl.style.top = '0';
+      sourceEl.style.left = '0';
+      sourceEl.style.zIndex = '999999';
+      sourceEl.style.width = '210mm';
+      sourceEl.style.background = '#ffffff';
+      
+      document.body.appendChild(sourceEl);
+
       const cleanInvNumber = (invoice && invoice.invoiceNumber) ? invoice.invoiceNumber.replace(/[^a-zA-Z0-9]/g, '-') : 'Bill';
       const opt = {
-        margin:       10,
-        filename:     `Invoice-KO-${cleanInvNumber}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        margin: 0,
+        filename: `Invoice-KO-${cleanInvNumber}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
+
       setTimeout(() => {
         window.html2pdf().set(opt).from(sourceEl).save().then(() => {
+          sourceEl.style.cssText = originalCss;
+          if (nextSibling) {
+            parentNode.insertBefore(sourceEl, nextSibling);
+          } else {
+            parentNode.appendChild(sourceEl);
+          }
           Utils.showToast(`Invoice-KO-${cleanInvNumber}.pdf downloaded successfully!`, 'success');
         }).catch(err => {
           console.error('PDF generation error:', err);
+          sourceEl.style.cssText = originalCss;
+          parentNode.appendChild(sourceEl);
           Utils.showToast('PDF generation failed. Opening print dialog...', 'warning');
           window.print();
         });
@@ -658,24 +765,55 @@ export const Billing = {
       try {
         const sourceEl = document.getElementById('invoicePaper') || document.getElementById('printableInvoiceContainer');
         if (sourceEl && window.html2pdf) {
-          const opt = {
-            margin:       10,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-          };
-          const pdfDataUri = await window.html2pdf().set(opt).from(sourceEl).outputPdf('datauristring');
-          const res = await window.electronAPI.saveInvoicePDF({
-            invoiceNumber: invoice.invoiceNumber,
-            base64Data: pdfDataUri,
-            dateStr: invoice.date
+          const images = sourceEl.querySelectorAll('img');
+          const promises = Array.from(images).map(img => {
+            if (img.complete) return Promise.resolve();
+            return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
           });
-          if (res.success) {
-            Utils.showToast(`Invoice saved to Documents: ${res.path}`, 'success');
-          }
+          await Promise.all(promises);
+
+          const parentNode = sourceEl.parentNode;
+          const nextSibling = sourceEl.nextSibling;
+          const originalCss = sourceEl.style.cssText;
+          
+          sourceEl.style.position = 'absolute';
+          sourceEl.style.top = '0';
+          sourceEl.style.left = '0';
+          sourceEl.style.zIndex = '999999';
+          sourceEl.style.width = '210mm';
+          sourceEl.style.background = '#ffffff';
+          document.body.appendChild(sourceEl);
+
+          const opt = {
+            margin: 0,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          };
+
+          setTimeout(() => {
+            window.html2pdf().set(opt).from(sourceEl).outputPdf('datauristring').then(async (pdfBase64) => {
+              sourceEl.style.cssText = originalCss;
+              if (nextSibling) parentNode.insertBefore(sourceEl, nextSibling);
+              else parentNode.appendChild(sourceEl);
+
+              const cleanInvNumber = (invoice.invoiceNumber || 'Bill').replace(/[^a-zA-Z0-9]/g, '-');
+              const fileName = `Invoice-KO-${cleanInvNumber}.pdf`;
+              const base64Data = pdfBase64.split(',')[1];
+
+              const res = await window.electronAPI.saveInvoicePDF(base64Data, fileName);
+              if (res && res.success) {
+                console.log('PDF auto-saved:', res.filePath);
+              }
+            }).catch(err => {
+              sourceEl.style.cssText = originalCss;
+              parentNode.appendChild(sourceEl);
+              console.error('AutoSave PDF err:', err);
+            });
+          }, 250);
         }
       } catch (err) {
-        console.error('Auto save PDF failed:', err);
+        console.error('Failed to auto-save PDF via html2pdf:', err);
       }
     }
   },
